@@ -6,7 +6,6 @@
 <hibernate-configuration>
     <session-factory>
 
-
         <property name="hibernate.connection.driver_class">
             com.mysql.cj.jdbc.Driver
         </property>
@@ -31,8 +30,6 @@
         <property name="hibernate.connection.pool_size">10</property>
 
         <!-- ===== DÉCLARATION DES ENTITÉS ===== -->
-
-        <!--
         <mapping class="sn.epf.pointage.model.Professeur"/>
         <mapping class="sn.epf.pointage.model.Cours"/>
         <mapping class="sn.epf.pointage.model.Salle"/>
@@ -42,7 +39,6 @@
         <mapping class="sn.epf.pointage.model.PeriodiciteCours"/>
         <mapping class="sn.epf.pointage.model.RapportMensuel"/>
         <mapping class="sn.epf.pointage.model.Utilisateur"/>
-        -->
 
     </session-factory>
 </hibernate-configuration>
