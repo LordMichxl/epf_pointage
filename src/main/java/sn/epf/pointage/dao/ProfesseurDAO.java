@@ -53,4 +53,12 @@ public class ProfesseurDAO extends AbstractDAO<Professeur, Long> {
                 Professeur.class).setParameter("f", filiere).getResultList();
         }
     }
+
+    public long count() {
+        try (Session session = getSession()) {
+            return session.createQuery(
+                    "SELECT COUNT(p) FROM Professeur p ",
+                    long.class).getSingleResult();
+        }
+    }
 }

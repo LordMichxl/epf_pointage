@@ -54,4 +54,20 @@ public class SeanceDAO extends AbstractDAO<SeancePlanifiee, Long> {
                 .setParameter("now", LocalDateTime.now()).getResultList();
         }
     }
+    public long countSeancesPlanifieesRestantes(int profId, int mois, Long annee) {
+        try (Session session = getSession()) {
+            return session.createQuery(
+                            "SELECT COUNT(s) FROM SeancePlanifiee s " +
+                                    "WHERE s.assignation.professeur.id = :p " +
+                                    "AND MONTH(s.dateHeure) = :m " +
+                                    "AND YEAR(s.dateHeure) = :a " +
+                                    "AND s.statut = :st",
+                            Long.class)
+                    .setParameter("p", profId)
+                    .setParameter("m", mois)
+                    .setParameter("a", annee)
+                    .setParameter("st", StatutSeance.PLANIFIEE)
+                    .getSingleResult();
+        }
+    }
 }
