@@ -73,4 +73,14 @@ public class RapportService {
         rapport.setStatut(StatutRapport.PAYE);
         rapportDAO.update(rapport);
     }
+
+    public void exporterPDF(Long rapportId) {
+        RapportMensuel rapport = rapportDAO.findById(rapportId)
+                .orElseThrow(() -> new IllegalArgumentException("Rapport introuvable"));
+
+        // TODO: génération PDF (iText ou autre)
+        System.out.println("Export PDF du rapport ID: " + rapportId);
+
+        // pour l’instant simulation
+    }
 }

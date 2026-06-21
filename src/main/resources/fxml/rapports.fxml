@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sn.epf.pointage.ui.RapportsController"
+      spacing="0" style="-fx-background-color: #f5f5f5;">
+
+    <!-- EN-TÊTE -->
+    <HBox alignment="CENTER_LEFT" spacing="16"
+          style="-fx-background-color: white; -fx-padding: 16 24 16 24;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
+        <Label text="📊 Rapports Mensuels" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnGenererPDF" text="📄 Exporter PDF"
+                styleClass="btn-secondary" onAction="#exporterPDF" disable="true"/>
+        <Button fx:id="btnValider" text="✔ Valider le rapport"
+                styleClass="btn-primary" onAction="#validerRapport" disable="true"/>
+    </HBox>
+
+    <!-- FILTRES -->
+    <HBox spacing="16" alignment="CENTER_LEFT"
+          style="-fx-padding: 16 24 16 24; -fx-background-color: white;
+                 -fx-border-color: #eee; -fx-border-width: 0 0 1 0;">
+
+        <Label text="Professeur :" style="-fx-font-weight: bold;"/>
+        <ComboBox fx:id="comboProfesseur" promptText="Sélectionner..."
+                  style="-fx-pref-width: 220px;"/>
+
+        <Label text="Mois :" style="-fx-font-weight: bold;"/>
+        <ComboBox fx:id="comboMois" style="-fx-pref-width: 140px;"/>
+
+        <Label text="Année :" style="-fx-font-weight: bold;"/>
+        <ComboBox fx:id="comboAnnee" style="-fx-pref-width: 100px;"/>
+
+        <Button text="🔍 Générer le rapport" styleClass="btn-primary"
+                onAction="#genererRapport" style="-fx-pref-height: 36px;"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="labelStatutRapport" text=""
+               style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <!-- CORPS -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 20 24 24 24;">
+
+        <!-- Tableau des séances du mois -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS">
+            <Label text="Détail des séances du mois" styleClass="section-title"/>
+            <TableView fx:id="tableSeances" VBox.vgrow="ALWAYS"
+                       style="-fx-background-radius: 8px; -fx-border-radius: 8px;
+                              -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,1);">
+                <columns>
+                    <TableColumn fx:id="colDate"    text="Date"      prefWidth="120"/>
+                    <TableColumn fx:id="colCours"   text="Cours"     prefWidth="180"/>
+                    <TableColumn fx:id="colDebut"   text="Début"     prefWidth="90"/>
+                    <TableColumn fx:id="colFin"     text="Fin"       prefWidth="90"/>
+                    <TableColumn fx:id="colDuree"   text="Durée (h)" prefWidth="90"/>
+                    <TableColumn fx:id="colStatut"  text="Statut"    prefWidth="120"/>
+                </columns>
+                <placeholder>
+                    <Label text="Sélectionnez un professeur et un mois pour afficher le rapport"
+                           style="-fx-text-fill: #999;" wrapText="true"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Panneau résumé -->
+        <VBox spacing="16" minWidth="260" maxWidth="280">
+
+            <!-- Totaux -->
+            <VBox styleClass="card" spacing="14">
+                <Label text="Récapitulatif" styleClass="section-title"/>
+
+                <VBox spacing="4">
+                    <Label text="Séances réalisées"
+                           style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="labelNbSeances" text="—"
+                           style="-fx-font-size: 22px; -fx-font-weight: bold;
+                                  -fx-text-fill: #241654;"/>
+                </VBox>
+                <Separator/>
+                <VBox spacing="4">
+                    <Label text="Heures totales"
+                           style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="labelHeures" text="— h"
+                           style="-fx-font-size: 22px; -fx-font-weight: bold;
+                                  -fx-text-fill: #241654;"/>
+                </VBox>
+                <Separator/>
+                <VBox spacing="4">
+                    <Label text="Montant à payer"
+                           style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="labelMontant" text="— XOF"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold;
+                                  -fx-text-fill: #1E8449;"/>
+                </VBox>
+                <Separator/>
+                <VBox spacing="4">
+                    <Label text="Retards ce mois"
+                           style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="labelRetards" text="—"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold;
+                                  -fx-text-fill: #D35400;"/>
+                </VBox>
+            </VBox>
+
+            <!-- Infos professeur -->
+            <VBox styleClass="card" spacing="10" fx:id="carteProf">
+                <Label text="Professeur" styleClass="section-title"/>
+                <Label fx:id="labelProfNom" text="—"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label fx:id="labelProfMatricule" text="—"
+                       style="-fx-text-fill: #888; -fx-font-size: 12px;"/>
+                <Label fx:id="labelProfContrat" text="—"
+                       style="-fx-text-fill: #888; -fx-font-size: 12px;"/>
+                <Label fx:id="labelProfTaux" text="—"
+                       style="-fx-text-fill: #888; -fx-font-size: 12px;"/>
+            </VBox>
+
+            <!-- Message -->
+            <Label fx:id="labelMessage" text="" wrapText="true"
+                   style="-fx-font-size: 12px;"/>
+        </VBox>
+    </HBox>
+
+</VBox>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sn.epf.pointage.ui.PointageController"
+      spacing="0" style="-fx-background-color: #f5f5f5;">
+
+    <!--EN-TÊTE -->
+    <HBox alignment="CENTER_LEFT" spacing="16"
+          style="-fx-background-color: white; -fx-padding: 16 24 16 24;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
+        <VBox>
+            <Label text="✅ Interface de Pointage" styleClass="page-title"/>
+            <Label fx:id="labelDate" text=""
+                   style="-fx-text-fill: #888; -fx-font-size: 13px;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Horloge en temps réel -->
+        <Label fx:id="labelHeure" text="00:00:00"
+               style="-fx-font-size: 28px; -fx-font-weight: bold;
+                      -fx-text-fill: #241654;"/>
+    </HBox>
+
+    <!-- MESSAGE D'ALERTE (succès / erreur) -->
+    <Label fx:id="labelMessage" text="" wrapText="true"
+           style="-fx-padding: 10 24 0 24; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+
+    <!--CORPS  -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 20 24 24 24;">
+
+        <!-- Colonne gauche : séances du jour -->
+        <VBox spacing="12" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Séances du jour" styleClass="section-title"/>
+                <Label fx:id="labelNbSeances" text="(0)"
+                       style="-fx-text-fill: #888; -fx-font-size: 13px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🔄 Actualiser" styleClass="btn-secondary"
+                        onAction="#actualiser" style="-fx-pref-height: 32px;"/>
+            </HBox>
+
+            <TableView fx:id="tableSeances" VBox.vgrow="ALWAYS"
+                       style="-fx-background-radius: 8px; -fx-border-radius: 8px;
+                              -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,1);">
+                <columns>
+                    <TableColumn fx:id="colHeure"   text="Heure"    prefWidth="90"/>
+                    <TableColumn fx:id="colCours"   text="Cours"    prefWidth="180"/>
+                    <TableColumn fx:id="colSalle"   text="Salle"    prefWidth="90"/>
+                    <TableColumn fx:id="colDuree"   text="Durée"    prefWidth="80"/>
+                    <TableColumn fx:id="colStatut"  text="Statut"   prefWidth="120"/>
+                    <TableColumn fx:id="colFenetre" text="Fenêtre"  prefWidth="130"/>
+                </columns>
+                <placeholder>
+                    <Label text="Aucune séance prévue aujourd'hui"
+                           style="-fx-text-fill: #999;"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Colonne droite : panneau de pointage -->
+        <VBox spacing="16" minWidth="280" maxWidth="300">
+
+            <!-- Carte séance sélectionnée -->
+            <VBox styleClass="card" spacing="10" fx:id="carteSeance">
+                <Label text="Séance sélectionnée" styleClass="section-title"/>
+                <Label fx:id="labelSeanceCours"
+                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #241654;"
+                       text="—" wrapText="true"/>
+                <Label fx:id="labelSeanceHeure"
+                       style="-fx-text-fill: #555; -fx-font-size: 13px;" text="—"/>
+                <Label fx:id="labelSeanceSalle"
+                       style="-fx-text-fill: #888; -fx-font-size: 12px;" text="—"/>
+                <Separator/>
+
+                <!-- Indicateur fenêtre de pointage -->
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Fenêtre :" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+                    <Label fx:id="labelFenetreStatut" text="—"
+                           style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                </HBox>
+                <Label fx:id="labelEcartTemps" text=""
+                       style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+            </VBox>
+
+            <!-- Boutons de pointage -->
+            <VBox styleClass="card" spacing="12">
+                <Label text="Enregistrer ma présence" styleClass="section-title"/>
+
+                <Button fx:id="btnPointerDebut" text="▶  POINTER DÉBUT"
+                        onAction="#pointerDebut"
+                        style="-fx-pref-width: 9999px; -fx-pref-height: 48px;
+                               -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-color: #1E8449; -fx-text-fill: white;
+                               -fx-background-radius: 6px; -fx-cursor: hand;"
+                        disable="true"/>
+
+                <Button fx:id="btnPointerFin" text="⏹  POINTER FIN"
+                        onAction="#pointerFin"
+                        style="-fx-pref-width: 9999px; -fx-pref-height: 48px;
+                               -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-color: #D35400; -fx-text-fill: white;
+                               -fx-background-radius: 6px; -fx-cursor: hand;"
+                        disable="true"/>
+
+                <Label text="ℹ Sélectionne une séance puis clique sur Pointer"
+                       style="-fx-text-fill: #aaa; -fx-font-size: 11px;" wrapText="true"/>
+            </VBox>
+
+            <!-- Récapitulatif du jour -->
+            <VBox styleClass="card" spacing="8">
+                <Label text="Récapitulatif du jour" styleClass="section-title"/>
+                <HBox spacing="8">
+                    <Label text="✅" style="-fx-font-size: 14px;"/>
+                    <Label fx:id="labelNbRealisees" text="0 séance(s) réalisée(s)"
+                           style="-fx-font-size: 13px;"/>
+                </HBox>
+                <HBox spacing="8">
+                    <Label text="⏳" style="-fx-font-size: 14px;"/>
+                    <Label fx:id="labelNbEnAttente" text="0 séance(s) en attente"
+                           style="-fx-font-size: 13px;"/>
+                </HBox>
+                <HBox spacing="8">
+                    <Label text="⚠" style="-fx-font-size: 14px;"/>
+                    <Label fx:id="labelNbRetards" text="0 retard(s) ce mois"
+                           style="-fx-font-size: 13px; -fx-text-fill: #D35400;"/>
+                </HBox>
+            </VBox>
+
+        </VBox>
+    </HBox>
+
+</VBox>

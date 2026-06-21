@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sn.epf.pointage.ui.ProfFormController"
+      spacing="0" style="-fx-background-color: #f5f5f5;">
+
+    <!--EN-TÊTE -->
+    <HBox alignment="CENTER_LEFT" spacing="12"
+          style="-fx-background-color: white; -fx-padding: 16 24 16 24;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
+        <Button text="← Retour" styleClass="btn-secondary" onAction="#retourListe"
+                style="-fx-pref-height: 32px;"/>
+        <Label fx:id="labelTitre" text="Nouveau professeur" styleClass="page-title"/>
+    </HBox>
+
+    <!--CORPS -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color: transparent; -fx-background: transparent;">
+        <HBox spacing="24" style="-fx-padding: 24;">
+
+            <!-- Colonne gauche : photo -->
+            <VBox spacing="12" alignment="TOP_CENTER" minWidth="200">
+                <VBox alignment="CENTER" spacing="8"
+                      style="-fx-background-color: white; -fx-background-radius: 8px;
+                             -fx-padding: 20px;
+                             -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,1);">
+                    <ImageView fx:id="imagePhoto" fitWidth="140" fitHeight="140"
+                               preserveRatio="true"
+                               style="-fx-effect: dropshadow(gaussian,rgba(0,0,0,0.1),4,0,0,0);"/>
+                    <Button text="📷 Choisir une photo" styleClass="btn-secondary"
+                            onAction="#choisirPhoto" style="-fx-pref-width: 160px;"/>
+                    <Label fx:id="erreurPhoto" styleClass="error-label" text=""/>
+                </VBox>
+
+                <!-- Statut actif -->
+                <VBox style="-fx-background-color: white; -fx-background-radius: 8px;
+                             -fx-padding: 16px;
+                             -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,1);">
+                    <Label text="Statut du compte" styleClass="section-title"
+                           style="-fx-padding: 0 0 8 0;"/>
+                    <CheckBox fx:id="checkActif" text="Professeur actif" selected="true"
+                              style="-fx-text-fill: #333;"/>
+                </VBox>
+            </VBox>
+
+            <!-- Colonne droite : formulaire -->
+            <VBox spacing="16" HBox.hgrow="ALWAYS">
+
+                <!-- Informations personnelles -->
+                <VBox styleClass="card" spacing="14">
+                    <Label text="Informations personnelles" styleClass="section-title"/>
+                    <GridPane hgap="16" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+
+                        <!-- Nom -->
+                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Nom *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <TextField fx:id="champNom" promptText="Ex: Diallo"/>
+                            <Label fx:id="erreurNom" styleClass="error-label" text=""/>
+                        </VBox>
+
+                        <!-- Prénom -->
+                        <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Prénom *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <TextField fx:id="champPrenom" promptText="Ex: Moussa"/>
+                            <Label fx:id="erreurPrenom" styleClass="error-label" text=""/>
+                        </VBox>
+
+                        <!-- Email -->
+                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Email *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <TextField fx:id="champEmail" promptText="prenom.nom@epf.sn"/>
+                            <Label fx:id="erreurEmail" styleClass="error-label" text=""/>
+                        </VBox>
+
+                        <!-- Téléphone -->
+                        <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Téléphone" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <TextField fx:id="champTelephone" promptText="77 XXX XX XX"/>
+                            <Label fx:id="erreurTelephone" styleClass="error-label" text=""/>
+                        </VBox>
+
+                        <!-- Date embauche -->
+                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                            <Label text="Date d'embauche" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <DatePicker fx:id="dateEmbauche" style="-fx-pref-width: 9999px;"/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+
+                <!-- Informations contractuelles -->
+                <VBox styleClass="card" spacing="14">
+                    <Label text="Informations contractuelles" styleClass="section-title"/>
+                    <GridPane hgap="16" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+
+                        <!-- Type de contrat -->
+                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Type de contrat *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <ComboBox fx:id="comboContrat" style="-fx-pref-width: 9999px;"/>
+                            <Label fx:id="erreurContrat" styleClass="error-label" text=""/>
+                        </VBox>
+
+                        <!-- Taux horaire -->
+                        <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Taux horaire (XOF) *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <TextField fx:id="champTaux" promptText="Ex: 15000"/>
+                            <Label fx:id="erreurTaux" styleClass="error-label" text=""/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+
+                <!-- Compte d'accès -->
+                <VBox styleClass="card" spacing="14" fx:id="panneauCompte">
+                    <Label text="Compte d'accès" styleClass="section-title"/>
+                    <GridPane hgap="16" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Login *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <TextField fx:id="champLogin" promptText="Ex: m.diallo"/>
+                            <Label fx:id="erreurLogin" styleClass="error-label" text=""/>
+                        </VBox>
+                        <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Mot de passe *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                            <PasswordField fx:id="champMotDePasse" promptText="Min. 6 caractères"/>
+                            <Label fx:id="erreurMotDePasse" styleClass="error-label" text=""/>
+                        </VBox>
+                    </GridPane>
+                    <Label text="ℹ Le mot de passe sera haché automatiquement (BCrypt)"
+                           style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                </VBox>
+
+                <!-- Boutons -->
+                <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
+                    <Button text="Annuler" styleClass="btn-secondary" onAction="#retourListe"/>
+                    <Button fx:id="btnEnregistrer" text="Enregistrer"
+                            styleClass="btn-primary" onAction="#enregistrer"/>
+                </HBox>
+
+                <!-- Message global -->
+                <Label fx:id="messageGlobal" text="" wrapText="true"
+                       style="-fx-font-size: 13px;"/>
+
+            </VBox>
+        </HBox>
+    </ScrollPane>
+
+</VBox>
