@@ -61,4 +61,12 @@ public class ProfesseurDAO extends AbstractDAO<Professeur, Long> {
                     long.class).getSingleResult();
         }
     }
+
+    public List<Professeur> findActifs() {
+        try (Session session = getSession()) {
+            return session.createQuery(
+                    "SELECT DISTINCT a.professeur FROM Assignation a WHERE a.professeur.actif = true",
+                    Professeur.class).getResultList();
+        }
+    }
 }

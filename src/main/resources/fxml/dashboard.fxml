@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="sn.epf.pointage.ui.DashboardController"
+      spacing="20">
+
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Tableau de bord" styleClass="page-title"/>
+
+    <HBox spacing="16">
+        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+            <Label text="Séances du jour" styleClass="card-label"/>
+            <Label fx:id="labelSeancesJour" text="0" styleClass="card-value"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+            <Label text="Présents" styleClass="card-label"/>
+            <Label fx:id="labelPresents" text="0" styleClass="card-value status-ok"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+            <Label text="Absents" styleClass="card-label"/>
+            <Label fx:id="labelAbsents" text="0" styleClass="card-value status-absent"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+            <Label text="Taux de présence" styleClass="card-label"/>
+            <Label fx:id="labelTaux" text="0%" styleClass="card-value"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="16">
+        <LineChart fx:id="lineChartSeances" title="Séances réalisées (6 derniers mois)" HBox.hgrow="ALWAYS">
+            <xAxis><CategoryAxis/></xAxis>
+            <yAxis><NumberAxis/></yAxis>
+        </LineChart>
+        <PieChart fx:id="pieChartContrats" title="Vacataires / Permanents" prefWidth="320"/>
+    </HBox>
+
+    <Label text="Alertes — séances sans pointage" styleClass="section-title"/>
+    <TableView fx:id="tableAlertes" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colCoursAlerte" text="Cours" prefWidth="250"/>
+            <TableColumn fx:id="colHeureAlerte" text="Heure" prefWidth="100"/>
+            <TableColumn fx:id="colProfAlerte" text="Professeur" prefWidth="200"/>
+        </columns>
+    </TableView>
+
+</VBox>

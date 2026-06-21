@@ -70,4 +70,14 @@ public class SeanceDAO extends AbstractDAO<SeancePlanifiee, Long> {
                     .getSingleResult();
         }
     }
+
+    public List<SeancePlanifiee> findEntreDates(LocalDateTime debutDateTime, LocalDateTime finDateTime) {
+        try (Session session = getSession()) {
+            return session.createQuery(
+                    "FROM SeancePlanifiee s " +
+                            "WHERE s.assignation.professeur.id = :p " +
+                            "AND s.dateHeure >= :d AND s.dateHeure < :f ORDER BY s.dateHeure",
+                    SeancePlanifiee.class).setParameter("d", debutDateTime).setParameter("f", finDateTime).getResultList();
+        }
+    }
 }

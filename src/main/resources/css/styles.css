@@ -1,0 +1,155 @@
+
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-base: #f5f5f5;
+    -epf-primary: #241654;
+    -epf-primary-light: #3B2470;
+    -epf-accent: #D0103A;
+    -epf-accent-light: #E6435F;
+}
+
+.sidebar {
+    -fx-background-color: -epf-primary;
+    -fx-padding: 20px;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 16px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 200px;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: -epf-accent;
+    -fx-background-radius: 6px;
+}
+
+.sidebar-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 16px;
+}
+
+.sidebar-user {
+    -fx-text-fill: #C9BFE0;
+    -fx-font-size: 12px;
+    -fx-padding: 0 16px 10px 16px;
+}
+
+.sidebar-btn-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FF6B81;
+    -fx-padding: 10px 16px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+}
+
+.btn-primary {
+    -fx-background-color: -epf-primary;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: -epf-accent;
+}
+
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: -epf-primary;
+    -fx-border-color: -epf-primary;
+    -fx-border-radius: 6px;
+    -fx-padding: 9px 20px;
+    -fx-cursor: hand;
+}
+
+.btn-danger {
+    -fx-background-color: -epf-accent;
+    -fx-text-fill: white;
+    -fx-padding: 9px 20px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.table-view .column-header {
+    -fx-background-color: -epf-primary;
+}
+.table-view .column-header-background .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.table-row-cell {
+    -fx-background-color: #E8E1F5;
+    -fx-text-fill: black;
+}
+
+.status-ok      { -fx-text-fill: #1E8449; -fx-font-weight: bold; }
+.status-retard  { -fx-text-fill: #D35400; -fx-font-weight: bold; }
+.status-absent  { -fx-text-fill: #C0392B; -fx-font-weight: bold; }
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);
+    -fx-padding: 16px;
+}
+.card-label { -fx-text-fill: #666; -fx-font-size: 13px; }
+.card-value { -fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -epf-primary; }
+
+.login-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0, 0, 4);
+}
+.subtitle-text { -fx-font-size: 16px; -fx-text-fill: #666666; }
+.error-label   { -fx-text-fill: -epf-accent; -fx-font-size: 12px; }
+
+.text-field, .password-field, .combo-box {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+    -fx-padding: 8px 12px;
+}
+.text-field, .password-field {
+    -fx-border-color: -epf-accent;
+}
+
+.page-title    { -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: -epf-primary; }
+.section-title { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: -epf-primary; }
+
+.grille-planning { -fx-background-color: white; -fx-padding: 8px; }
+.grille-entete-jour {
+    -fx-background-color: -epf-primary;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px;
+    -fx-font-size: 12px;
+}
+.grille-label-heure { -fx-text-fill: #666; -fx-font-size: 11px; -fx-padding: 4px; }
+
+.bloc-seance { -fx-padding: 4px 6px; -fx-background-radius: 4px; -fx-cursor: hand; }
+.bloc-seance-titre { -fx-font-size: 11px; -fx-font-weight: bold; }
+.bloc-seance-prof  { -fx-font-size: 10px; }
+
+.bloc-planifiee { -fx-background-color: #E8E1F5; }
+.bloc-planifiee .bloc-seance-titre, .bloc-planifiee .bloc-seance-prof { -fx-text-fill: -epf-primary; }
+.bloc-realisee  { -fx-background-color: #D4EFDF; }
+.bloc-realisee .bloc-seance-titre, .bloc-realisee .bloc-seance-prof { -fx-text-fill: #1E8449; }
+.bloc-annulee   { -fx-background-color: #FADBD8; }
+.bloc-annulee .bloc-seance-titre, .bloc-annulee .bloc-seance-prof { -fx-text-fill: -epf-accent; }
+.bloc-reportee  { -fx-background-color: #FDEBD0; }
+.bloc-reportee .bloc-seance-titre, .bloc-reportee .bloc-seance-prof { -fx-text-fill: #D35400; }
+
+.legende-planifiee { -fx-text-fill: -epf-primary; -fx-font-size: 11px; }
+.legende-realisee  { -fx-text-fill: #1E8449; -fx-font-size: 11px; }
+.legende-annulee   { -fx-text-fill: -epf-accent; -fx-font-size: 11px; }
+.legende-reportee  { -fx-text-fill: #D35400; -fx-font-size: 11px; }
+
+.champ-erreur { -fx-border-color: -epf-accent; -fx-border-width: 1.5px; }

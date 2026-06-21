@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="sn.epf.pointage.ui.PlanningController"
+      spacing="16">
+
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Planning &amp; Assignations" styleClass="page-title"/>
+
+    <TitledPane text="Nouvelle assignation" expanded="false">
+        <VBox spacing="10">
+            <HBox spacing="10">
+                <ComboBox fx:id="comboProfesseur" promptText="Professeur" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="comboCours" promptText="Cours" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="comboSalle" promptText="Salle" HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <HBox spacing="10">
+                <ComboBox fx:id="comboJour" promptText="Jour de la semaine"/>
+                <TextField fx:id="champHeureDebut" promptText="08:00" prefWidth="80"/>
+                <TextField fx:id="champHeureFin" promptText="10:00" prefWidth="80"/>
+                <ComboBox fx:id="comboFrequence" promptText="Fréquence"/>
+            </HBox>
+            <HBox spacing="10">
+                <DatePicker fx:id="champDebutSemestre" promptText="Début semestre"/>
+                <DatePicker fx:id="champFinSemestre" promptText="Fin semestre"/>
+                <Button text="Créer l'assignation" styleClass="btn-primary" onAction="#creerAssignation"/>
+            </HBox>
+            <Label fx:id="messageResultat" wrapText="true"/>
+        </VBox>
+    </TitledPane>
+
+    <!-- Navigation de semaine + légende des couleurs -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Button text="◀" onAction="#semainePrecedente"/>
+        <Label fx:id="labelSemaine" styleClass="section-title"/>
+        <Button text="▶" onAction="#semaineSuivante"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="● Planifiée" styleClass="legende-planifiee"/>
+        <Label text="● Réalisée" styleClass="legende-realisee"/>
+        <Label text="● Annulée" styleClass="legende-annulee"/>
+        <Label text="● Reportée" styleClass="legende-reportee"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <GridPane fx:id="grillePlanning" styleClass="grille-planning" hgap="2" vgap="2"/>
+    </ScrollPane>
+
+</VBox>

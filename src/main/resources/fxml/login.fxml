@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="sn.epf.pointage.ui.LoginController"
+      styleClass="login-container"
+      alignment="CENTER"
+      spacing="16"
+      maxWidth="360">
+
+    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+    <ImageView fitWidth="180" preserveRatio="true">
+        <image>
+            <Image url="@../images/epf_logo.png"/>
+        </image>
+    </ImageView>
+    <Label text="Système de Pointage" styleClass="subtitle-text"/>
+
+    <Separator/>
+
+    <VBox spacing="4">
+        <Label text="Login"/>
+        <TextField fx:id="loginField" promptText="Votre email"/>
+    </VBox>
+
+    <VBox spacing="4">
+        <Label text="Mot de passe"/>
+        <PasswordField fx:id="passwordField" promptText="Votre mot de passe"/>
+    </VBox>
+
+    <Label fx:id="messageErreur" styleClass="error-label" visible="false" wrapText="true"/>
+
+    <Button fx:id="btnConnexion"
+            text="Se connecter"
+            onAction="#seConnecter"
+            styleClass="btn-primary"
+            maxWidth="Infinity"/>
+
+</VBox>
