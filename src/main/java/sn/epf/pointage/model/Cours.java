@@ -58,4 +58,8 @@ public class Cours {
     public Integer getSemestre()                 { return semestre; }
     public void setSemestre(Integer s)           { this.semestre = s; }
     public List<Assignation> getAssignations()   { return assignations; }
+    @Override
+    public String toString() {
+        return code + " - " + intitule;
+    }
 }

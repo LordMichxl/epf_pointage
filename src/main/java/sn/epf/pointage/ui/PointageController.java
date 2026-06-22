@@ -176,9 +176,9 @@ public class PointageController {
                 if (empty) { setText(null); setStyle(""); return; }
                 SeancePlanifiee s = getTableView().getItems().get(getIndex());
                 long ecart = ChronoUnit.MINUTES.between(LocalDateTime.now(), s.getDateHeure());
-                if (ecart > 15)       { setText("🕐 Trop tôt");    setStyle("-fx-text-fill: #888;"); }
-                else if (ecart >= -5) { setText("✅ Ouverte");      setStyle("-fx-text-fill: #1E8449; -fx-font-weight: bold;"); }
-                else                  { setText("⛔ Fermée");       setStyle("-fx-text-fill: #C0392B;"); }
+                if (ecart > 15)       { setText("Trop tôt");    setStyle("-fx-text-fill: #888;"); }
+                else if (ecart >= -5) { setText("Ouverte");      setStyle("-fx-text-fill: #1E8449; -fx-font-weight: bold;"); }
+                else                  { setText("Fermée");       setStyle("-fx-text-fill: #C0392B;"); }
             }
         });
     }

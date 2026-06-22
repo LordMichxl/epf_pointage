@@ -74,7 +74,7 @@ public class DashboardController {
 
             List<SeancePlanifiee> sansPointage = seanceDAO.findSansPointageDebut();
 
-            List<Professeur> actifs = professeurDAO.findActifs();
+            List<Professeur> actifs = professeurDAO.findAllActifs();
             long vacataires = actifs.stream().filter(p -> p.getTypeContrat() == TypeContrat.VACATAIRE).count();
             long permanents = actifs.stream().filter(p -> p.getTypeContrat() == TypeContrat.PERMANENT).count();
 
@@ -107,7 +107,7 @@ public class DashboardController {
     }
 
     private long compterSeancesRealiseesDuMois(int mois, int annee) {
-        return professeurDAO.findActifs().stream()
+        return professeurDAO.findAllActifs().stream()
                 .flatMap(p -> seanceDAO.findByProfesseurEtMois(p.getId(), mois, annee).stream())
                 .filter(s -> s.getStatut() == StatutSeance.REALISEE)
                 .count();

@@ -45,4 +45,9 @@ public class Salle {
     public String getEquipements()             { return equipements; }
     public void setEquipements(String e)       { this.equipements = e; }
     public List<Assignation> getAssignations() { return assignations; }
+
+    @Override
+    public String toString() {
+        return nom + " (" + batiment + ")";
+    }
 }

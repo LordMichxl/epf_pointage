@@ -93,7 +93,6 @@ public class Professeur {
 
     @Override
     public String toString() {
-        return "Professeur{id=" + id + ", matricule='" + matricule
-                + "', nom='" + nom + " " + prenom + "', actif=" + actif + "}";
+        return nom + " " + prenom;
     }
 }

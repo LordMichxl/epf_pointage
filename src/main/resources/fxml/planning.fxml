@@ -15,8 +15,12 @@
         <VBox spacing="10">
             <HBox spacing="10">
                 <ComboBox fx:id="comboProfesseur" promptText="Professeur" HBox.hgrow="ALWAYS"/>
+
                 <ComboBox fx:id="comboCours" promptText="Cours" HBox.hgrow="ALWAYS"/>
+                <Button text="+" onAction="#ouvrirDialogueNouveauCours" styleClass="btn-secondary"/>
+
                 <ComboBox fx:id="comboSalle" promptText="Salle" HBox.hgrow="ALWAYS"/>
+                <Button text="+" onAction="#ouvrirDialogueNouvelleSalle" styleClass="btn-secondary"/>
             </HBox>
             <HBox spacing="10">
                 <ComboBox fx:id="comboJour" promptText="Jour de la semaine"/>

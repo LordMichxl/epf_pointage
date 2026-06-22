@@ -20,10 +20,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Locale;
 
 public class PlanningController {
 
-    // ── Formulaire de création d'assignation ──────────────────────────
     @FXML private ComboBox<Professeur> comboProfesseur;
     @FXML private ComboBox<Cours> comboCours;
     @FXML private ComboBox<Salle> comboSalle;
@@ -53,7 +53,20 @@ public class PlanningController {
 
     @FXML
     public void initialize() {
-        comboJour.getItems().setAll(DayOfWeek.values());
+        comboJour.getItems().setAll(JOURS);
+        comboJour.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(DayOfWeek item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String nom = item.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.FRENCH);
+                    setText(nom.substring(0, 1).toUpperCase() + nom.substring(1));
+                }
+            }
+        });
+        comboJour.setButtonCell(comboJour.getCellFactory().call(null));
         comboFrequence.getItems().setAll(Frequence.values());
         chargerListesDeroulantes();
         debutSemaineAffichee = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
@@ -74,15 +87,15 @@ public class PlanningController {
 
 
     private void rafraichirGrille() {
-        LocalDate finSemaine = debutSemaineAffichee.plusDays(JOURS.length);
+        LocalDate finSemaine = debutSemaineAffichee.plusDays(JOURS.length-1);
 
-        DateTimeFormatter fmtJour = DateTimeFormatter.ofPattern("dd/MM");
+        DateTimeFormatter fmtJour = DateTimeFormatter.ofPattern("dd/MM",java.util.Locale.FRENCH);
         labelSemaine.setText("Semaine du " + debutSemaineAffichee.format(fmtJour)
                 + " au " + debutSemaineAffichee.plusDays(JOURS.length - 1).format(fmtJour));
 
         new Thread(() -> {
             LocalDateTime debutDateTime = debutSemaineAffichee.atStartOfDay();
-            LocalDateTime finDateTime = finSemaine.atStartOfDay();
+            LocalDateTime finDateTime = finSemaine.atTime(23, 59, 59);
             List<SeancePlanifiee> seances = seanceDAO.findEntreDates(debutDateTime, finDateTime);
 
             Platform.runLater(() -> construireGrille(seances));
@@ -104,7 +117,7 @@ public class PlanningController {
         }
 
         grillePlanning.add(new Label(""), 0, 0);
-        DateTimeFormatter fmtEntete = DateTimeFormatter.ofPattern("EEE dd/MM");
+        DateTimeFormatter fmtEntete = DateTimeFormatter.ofPattern("EEE dd/MM", Locale.FRENCH);
         for (int j = 0; j < JOURS.length; j++) {
             LocalDate dateJour = debutSemaineAffichee.plusDays(j);
             Label entete = new Label(dateJour.format(fmtEntete));
@@ -115,6 +128,9 @@ public class PlanningController {
         }
 
         int nbLignes = HEURE_FIN_GRILLE - HEURE_DEBUT_GRILLE;
+        RowConstraints rowEntete = new RowConstraints(40);
+        grillePlanning.getRowConstraints().add(rowEntete);
+
         for (int h = 0; h < nbLignes; h++) {
             RowConstraints row = new RowConstraints(60);
             grillePlanning.getRowConstraints().add(row);
@@ -149,7 +165,7 @@ public class PlanningController {
 
     private Pane creerBlocSeance(SeancePlanifiee seance) {
         VBox bloc = new VBox(2);
-        bloc.getStyleClass().addAll("bloc-seance", classeCssSelonStatut(seance.getStatut()));
+        bloc.getStyleClass().add(classeCssSelonStatut(seance.getStatut()));
 
         Label titre = new Label(seance.getAssignation().getCours().getIntitule());
         titre.getStyleClass().add("bloc-seance-titre");
@@ -198,16 +214,32 @@ public class PlanningController {
     }
 
     private void changerStatut(SeancePlanifiee seance, StatutSeance nouveauStatut) {
-        seance.setStatut(nouveauStatut);
-        seanceDAO.update(seance);
-        rafraichirGrille();
+        new Thread(() -> {
+            try {
+                seance.setStatut(nouveauStatut);
+                seanceDAO.updateStatut(seance.getId(), nouveauStatut);
+
+                Platform.runLater(() -> {
+                    if (messageResultat != null) {
+                        messageResultat.setText("Statut mis à jour avec succès !");
+                    }
+                    rafraichirGrille();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                    if (messageResultat != null) {
+                        messageResultat.setText("Erreur lors du changement de statut.");
+                    }
+                });
+            }
+        }).start();
     }
 
-    // ── FORMULAIRE DE CRÉATION D'ASSIGNATION (inchangé) ─────────────────
 
     private void chargerListesDeroulantes() {
         new Thread(() -> {
-            List<Professeur> profs = professeurDAO.findActifs();
+            List<Professeur> profs = professeurDAO.findAllActifs();
             List<Cours> cours = coursDAO.findAll();
             List<Salle> salles = salleDAO.findAll();
             Platform.runLater(() -> {
@@ -246,5 +278,111 @@ public class PlanningController {
         } catch (Exception e) {
             messageResultat.setText(e.getMessage());
         }
+    }
+
+    @FXML
+    public void ouvrirDialogueNouveauCours() {
+        Dialog<Cours> dialog = new Dialog<>();
+        dialog.setTitle("Nouveau cours");
+        dialog.setHeaderText("Créer un nouveau cours");
+
+        ButtonType btnCreer = new ButtonType("Créer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnCreer, ButtonType.CANCEL);
+
+        TextField champCode = new TextField();
+        champCode.setPromptText("Ex: INFO301");
+        TextField champIntitule = new TextField();
+        champIntitule.setPromptText("Ex: Algorithmique Avancée");
+        TextField champVolume = new TextField();
+        champVolume.setPromptText("Ex: 45");
+        TextField champNiveau = new TextField();
+        champNiveau.setPromptText("Ex: L3");
+        TextField champFiliere = new TextField();
+        champFiliere.setPromptText("Ex: CSI");
+        TextField champSemestre = new TextField();
+        champSemestre.setPromptText("Ex: 1");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.addRow(0, new Label("Code *"), champCode);
+        grid.addRow(1, new Label("Intitulé *"), champIntitule);
+        grid.addRow(2, new Label("Volume horaire"), champVolume);
+        grid.addRow(3, new Label("Niveau"), champNiveau);
+        grid.addRow(4, new Label("Filière"), champFiliere);
+        grid.addRow(5, new Label("Semestre"), champSemestre);
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(bouton -> {
+            if (bouton != btnCreer) return null;
+            if (champCode.getText().isBlank() || champIntitule.getText().isBlank()) return null;
+
+            Cours cours = new Cours();
+            cours.setCode(champCode.getText());
+            cours.setIntitule(champIntitule.getText());
+            cours.setNiveauEtude(champNiveau.getText());
+            cours.setFiliere(champFiliere.getText());
+            try {
+                cours.setVolumeHoraireTotal(Integer.parseInt(champVolume.getText()));
+                cours.setSemestre(Integer.parseInt(champSemestre.getText()));
+            } catch (NumberFormatException ignored) {
+            }
+            return cours;
+        });
+
+        dialog.showAndWait().ifPresent(nouveauCours -> {
+            Cours saved = coursDAO.save(nouveauCours);
+            comboCours.getItems().add(saved);
+            comboCours.setValue(saved);
+            messageResultat.setText("Cours créé : " + saved.getIntitule());
+        });
+    }
+
+    @FXML
+    public void ouvrirDialogueNouvelleSalle() {
+        Dialog<Salle> dialog = new Dialog<>();
+        dialog.setTitle("Nouvelle salle");
+        dialog.setHeaderText("Créer une nouvelle salle");
+
+        ButtonType btnCreer = new ButtonType("Créer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnCreer, ButtonType.CANCEL);
+
+        TextField champNom = new TextField();
+        champNom.setPromptText("Ex: Salle A12");
+        TextField champCapacite = new TextField();
+        champCapacite.setPromptText("Ex: 40");
+        TextField champBatiment = new TextField();
+        champBatiment.setPromptText("Ex: Bâtiment A");
+        TextField champEquipements = new TextField();
+        champEquipements.setPromptText("Ex: Vidéoprojecteur");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.addRow(0, new Label("Nom *"), champNom);
+        grid.addRow(1, new Label("Capacité"), champCapacite);
+        grid.addRow(2, new Label("Bâtiment"), champBatiment);
+        grid.addRow(3, new Label("Équipements"), champEquipements);
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(bouton -> {
+            if (bouton != btnCreer || champNom.getText().isBlank()) return null;
+
+            Salle salle = new Salle();
+            salle.setNom(champNom.getText());
+            salle.setBatiment(champBatiment.getText());
+            salle.setEquipements(champEquipements.getText());
+            try {
+                salle.setCapacite(Integer.parseInt(champCapacite.getText()));
+            } catch (NumberFormatException ignored) {}
+            return salle;
+        });
+
+        dialog.showAndWait().ifPresent(nouvelleSalle -> {
+            Salle saved = salleDAO.save(nouvelleSalle);
+            comboSalle.getItems().add(saved);
+            comboSalle.setValue(saved);
+            messageResultat.setText("Salle créée : " + saved.getNom());
+        });
     }
 }
