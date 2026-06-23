@@ -24,14 +24,6 @@ import java.time.Year;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
-/*
- * ProfFormController — formulaire d'enrôlement/modification.
- *
- * Bonnes pratiques 4.2 :
- * - Validation en temps réel (listeners sur les champs)
- * - Indicateurs visuels d'erreur inline (labels sous chaque champ)
- * - Le contrôleur n'appelle que les DAO — jamais Hibernate directement
- */
 public class ProfFormController {
 
     @FXML private Label        labelTitre;
@@ -71,10 +63,8 @@ public class ProfFormController {
     // initialize()
     @FXML
     public void initialize() {
-        // Remplir le ComboBox contrat
         comboContrat.getItems().setAll(TypeContrat.values());
 
-        // Validation en temps réel sur chaque champ
         champNom.textProperty().addListener((o, old, val)
             -> validerChamp(champNom, erreurNom, val.trim().isEmpty(), "Le nom est obligatoire"));
         champPrenom.textProperty().addListener((o, old, val)
@@ -95,7 +85,6 @@ public class ProfFormController {
                 "Mot de passe trop court (min. 6 caractères)"));
     }
 
-    // Appelé depuis ProfesseursController
     public void setProfesseur(Professeur prof) {
         if (prof == null) {
             // MODE CRÉATION
@@ -104,12 +93,9 @@ public class ProfFormController {
             panneauCompte.setVisible(true);
             panneauCompte.setManaged(true);
         } else {
-            // MODE MODIFICATION
             modeCreation = false;
             professeurAModifier = prof;
             labelTitre.setText("Modifier — " + prof.getNom() + " " + prof.getPrenom());
-
-            // Pré-remplir les champs
             champNom.setText(prof.getNom());
             champPrenom.setText(prof.getPrenom());
             champEmail.setText(prof.getEmail());
@@ -127,7 +113,6 @@ public class ProfFormController {
                 } catch (Exception ignored) {}
             }
 
-            // En modification, masquer le panneau compte (déjà créé)
             panneauCompte.setVisible(false);
             panneauCompte.setManaged(false);
         }
@@ -148,7 +133,6 @@ public class ProfFormController {
         }
     }
 
-    //  Enregistrer
     @FXML
     private void enregistrer() {
         if (!toutEstValide()) {
@@ -165,8 +149,6 @@ public class ProfFormController {
             }
             messageGlobal.setText(" Enregistré avec succès !");
             messageGlobal.setStyle("-fx-text-fill: #1E8449;");
-
-            // Retour à la liste après 1 seconde
             PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(e -> retourListe());
             pause.play();
@@ -178,7 +160,6 @@ public class ProfFormController {
     }
 
     private void creerProfesseur() {
-        // Générer matricule automatique
         int annee = Year.now().getValue();
         String initiales = (champNom.getText().substring(0, 1)
                           + champPrenom.getText().substring(0, 1)).toUpperCase();
@@ -199,13 +180,9 @@ public class ProfFormController {
         p.setActif(true);
 
         Professeur saved = dao.save(p);
-
-        // Créer le compte utilisateur associé avec BCrypt
         String hash = BCrypt.hashpw(champMotDePasse.getText(), BCrypt.gensalt());
         Utilisateur u = new Utilisateur(champLogin.getText().trim(), hash, Role.PROFESSEUR);
         u.setProfesseurLie(saved);
-        // Note : UtilisateurDAO sera appelé ici quand disponible
-        // new UtilisateurDAO().save(u);
     }
 
     private void modifierProfesseur() {
@@ -236,7 +213,6 @@ public class ProfFormController {
         return ok;
     }
 
-    // Helpers validation visuelle
     private void validerChamp(Control champ, Label erreur, boolean invalide, String msg) {
         if (invalide) marquerErreur(champ, erreur, msg);
         else          retirerErreur(champ, erreur);
@@ -252,7 +228,6 @@ public class ProfFormController {
         erreur.setText("");
     }
 
-    //  Retour à la liste
     @FXML
     public void retourListe() {
         try {

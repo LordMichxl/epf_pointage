@@ -20,24 +20,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/*
- * RapportsController — bonnes pratiques 4.2 :
- *  Pas de requête Hibernate ici, uniquement appels services/DAO
- * ComboBox peuplés dynamiquement
- *  Boutons Valider/PDF activés uniquement quand rapport généré
- */
 public class RapportsController {
 
     @FXML private ComboBox<Professeur> comboProfesseur;
-    @FXML private ComboBox<String>     comboMois;
-    @FXML private ComboBox<Integer>    comboAnnee;
-    @FXML private Label                labelStatutRapport;
-    @FXML private Button               btnValider;
-    @FXML private Button               btnGenererPDF;
-    @FXML private Label                labelMessage;
+    @FXML private ComboBox<String> comboMois;
+    @FXML private ComboBox<Integer> comboAnnee;
+    @FXML private Label labelStatutRapport;
+    @FXML private Button btnValider;
+    @FXML private Button btnGenererPDF;
+    @FXML private Label labelMessage;
 
-    // Tableau des séances
-    @FXML private TableView<SeancePlanifiee>           tableSeances;
+    @FXML private TableView<SeancePlanifiee> tableSeances;
     @FXML private TableColumn<SeancePlanifiee, String> colDate;
     @FXML private TableColumn<SeancePlanifiee, String> colCours;
     @FXML private TableColumn<SeancePlanifiee, String> colDebut;
@@ -45,7 +38,6 @@ public class RapportsController {
     @FXML private TableColumn<SeancePlanifiee, String> colDuree;
     @FXML private TableColumn<SeancePlanifiee, String> colStatut;
 
-    // Résumé
     @FXML private Label labelNbSeances;
     @FXML private Label labelHeures;
     @FXML private Label labelMontant;
@@ -69,7 +61,6 @@ public class RapportsController {
         "Juillet","Août","Septembre","Octobre","Novembre","Décembre"
     };
 
-    // initialize()
     @FXML
     public void initialize() {
         configurerColonnes();
@@ -80,10 +71,8 @@ public class RapportsController {
         btnGenererPDF.setDisable(true);
     }
 
-    // Peuplement des ComboBox
     private void peuplerComboMois() {
         comboMois.setItems(FXCollections.observableArrayList(MOIS_NOMS));
-        // Sélectionner le mois en cours
         comboMois.getSelectionModel().select(LocalDateTime.now().getMonthValue() - 1);
     }
 
@@ -98,13 +87,11 @@ public class RapportsController {
         Utilisateur user = SessionContext.getInstance().getUtilisateurConnecte();
 
         if (user != null && user.getRole() == Role.PROFESSEUR) {
-            // Prof : se voit uniquement lui-même
             comboProfesseur.setItems(FXCollections.observableArrayList(user.getProfesseurLie()));
             comboProfesseur.getSelectionModel().selectFirst();
             comboProfesseur.setDisable(true);
             afficherInfoProf(user.getProfesseurLie());
         } else {
-            // Admin/Scolarité : tous les profs actifs
             List<Professeur> profs = professeurDAO.findAllActifs();
             comboProfesseur.setItems(FXCollections.observableArrayList(profs));
 
@@ -129,7 +116,6 @@ public class RapportsController {
         }
     }
 
-    // Générer le rapport
     @FXML
     private void genererRapport() {
         Professeur prof  = comboProfesseur.getValue();
@@ -141,7 +127,7 @@ public class RapportsController {
             return;
         }
 
-        int mois = moisIndex + 1; // ComboBox 0-indexé, mois 1-indexé
+        int mois = moisIndex + 1;
 
         try {
             // Appel au service — qui vérifie RG-06
@@ -153,21 +139,15 @@ public class RapportsController {
                 return;
             }
 
-            // Charger les séances REALISEES du mois
             List<SeancePlanifiee> seances = seanceDAO.findByProfesseurEtMois(prof.getId(), mois, annee)
                 .stream().filter(s -> s.getStatut() == StatutSeance.REALISEE).toList();
 
             tableSeances.setItems(FXCollections.observableArrayList(seances));
-
-            // Mettre à jour le résumé
             labelNbSeances.setText(String.valueOf(seances.size()));
             labelHeures.setText(String.format("%.2f h", rapportCourant.getHeuresRealisees()));
             labelMontant.setText(String.format("%,d XOF", rapportCourant.getMontantXOF()));
-
-            // Afficher le statut du rapport
             afficherStatutRapport(rapportCourant.getStatut());
 
-            // Activer les boutons selon le rôle et le statut
             Utilisateur user = SessionContext.getInstance().getUtilisateurConnecte();
             boolean peutValider = user != null
                 && (user.getRole() == Role.ADMIN || user.getRole() == Role.SCOLARITE)
@@ -182,7 +162,6 @@ public class RapportsController {
         }
     }
 
-    // Valider le rapport (rôle SCOLARITE/ADMIN uniquement)
     @FXML
     private void validerRapport() {
         if (rapportCourant == null) return;
@@ -207,7 +186,6 @@ public class RapportsController {
         });
     }
 
-    //  Exporter PDF
     @FXML
     private void exporterPDF() {
         if (rapportCourant == null) return;
@@ -219,7 +197,6 @@ public class RapportsController {
         }
     }
 
-    //  Configuration des colonnes
     private void configurerColonnes() {
         colDate.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
@@ -282,7 +259,6 @@ public class RapportsController {
         });
     }
 
-    // Helpers affichage
     private void afficherInfoProf(Professeur prof) {
         if (prof == null) return;
         labelProfNom.setText(prof.getNom() + " " + prof.getPrenom());

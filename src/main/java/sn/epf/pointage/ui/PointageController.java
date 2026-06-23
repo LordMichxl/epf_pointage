@@ -25,13 +25,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
-/*
- * PointageController — règles 4.2 :
- *  Horloge temps réel via Timeline JavaFX (mise à jour chaque seconde)
- * Toute modif UI depuis thread secondaire → Platform.runLater()
- *  Boutons activés/désactivés selon la fenêtre de pointage RG-01
- */
 public class PointageController {
 
     @FXML private Label  labelDate;
@@ -61,8 +54,8 @@ public class PointageController {
     private final PointageDAO   pointageDAO   = new PointageDAO();
     private final PointageService pointageService = new PointageService();
 
-    private Timeline horlogeTimeline;  // Timeline pour l'horloge en temps réel
-    private Timeline actualiserTimeline; // Timeline pour rafraîchir les données
+    private Timeline horlogeTimeline;
+    private Timeline actualiserTimeline;
 
     private static final DateTimeFormatter FMT_HEURE = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final DateTimeFormatter FMT_DATE  = DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy",
@@ -79,15 +72,10 @@ public class PointageController {
         afficherDateJour();
     }
 
-    // Horloge temps réel (4.2 : Timeline JavaFX)
     private void demarrerHorloge() {
-        // Met à jour l'horloge toutes les secondes
         horlogeTimeline = new Timeline(
             new KeyFrame(Duration.seconds(1), e -> {
-                // Règle 4.2 : modification UI depuis un thread secondaire → Platform.runLater()
-                // Ici on est déjà sur le thread JavaFX (Timeline), donc direct
                 labelHeure.setText(LocalDateTime.now().format(FMT_HEURE));
-                // Mettre à jour l'état des boutons à chaque seconde
                 SeancePlanifiee sel = tableSeances.getSelectionModel().getSelectedItem();
                 if (sel != null) mettreAJourBoutons(sel);
             })
@@ -95,7 +83,6 @@ public class PointageController {
         horlogeTimeline.setCycleCount(Timeline.INDEFINITE);
         horlogeTimeline.play();
 
-        // Rafraîchit les données toutes les 60 secondes (4.2)
         actualiserTimeline = new Timeline(
             new KeyFrame(Duration.seconds(60), e -> chargerSeances()));
         actualiserTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -107,9 +94,7 @@ public class PointageController {
         labelHeure.setText(LocalDateTime.now().format(FMT_HEURE));
     }
 
-    // Configuration des colonnes
     private void configurerColonnes() {
-        // Heure de la séance
         colHeure.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -119,7 +104,6 @@ public class PointageController {
             }
         });
 
-        // Cours via l'assignation
         colCours.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -131,7 +115,6 @@ public class PointageController {
             }
         });
 
-        // Salle
         colSalle.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -144,7 +127,6 @@ public class PointageController {
             }
         });
 
-        // Durée
         colDuree.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
@@ -154,7 +136,6 @@ public class PointageController {
             }
         });
 
-        // Statut avec couleur
         colStatut.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -169,7 +150,6 @@ public class PointageController {
             }
         });
 
-        // Indicateur fenêtre de pointage RG-01 : [-15min, +5min]
         colFenetre.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -190,18 +170,15 @@ public class PointageController {
 
         List<SeancePlanifiee> seances;
         if (user.getRole().name().equals("PROFESSEUR") && user.getProfesseurLie() != null) {
-            // Prof : ses séances uniquement
             seances = seanceDAO.findByProfesseurEtMois(
                 user.getProfesseurLie().getId(),
                 LocalDateTime.now().getMonthValue(),
                 LocalDateTime.now().getYear()
             );
-            // Filtrer pour aujourd'hui
             seances = seances.stream()
                 .filter(s -> s.getDateHeure().toLocalDate().equals(java.time.LocalDate.now()))
                 .toList();
         } else {
-            // Admin/Scolarité : toutes les séances du jour
             seances = seanceDAO.findSeancesDuJour();
         }
 
@@ -210,7 +187,6 @@ public class PointageController {
         mettreAJourRecap(seances);
     }
 
-    // Mise à jour du récapitulatif
     private void mettreAJourRecap(List<SeancePlanifiee> seances) {
         long realisees  = seances.stream().filter(s -> s.getStatut() == StatutSeance.REALISEE).count();
         long enAttente  = seances.stream().filter(s -> s.getStatut() == StatutSeance.PLANIFIEE).count();
@@ -218,7 +194,6 @@ public class PointageController {
         labelNbEnAttente.setText(enAttente + " séance(s) en attente");
     }
 
-    // Sélection d'une séance → mise à jour du panneau droit
     private void configurerSelectionSeance() {
         tableSeances.getSelectionModel().selectedItemProperty()
             .addListener((obs, old, seance) -> {
@@ -229,9 +204,9 @@ public class PointageController {
     private void afficherDetailSeance(SeancePlanifiee seance) {
         try {
             labelSeanceCours.setText(seance.getAssignation().getCours().getIntitule());
-            labelSeanceHeure.setText("🕐 " + seance.getDateHeure().format(FMT_HM)
+            labelSeanceHeure.setText(seance.getDateHeure().format(FMT_HM)
                 + " · " + seance.getDureeMinutes() + " min");
-            labelSeanceSalle.setText("📍 " + (seance.getAssignation().getSalle() != null
+            labelSeanceSalle.setText((seance.getAssignation().getSalle() != null
                 ? seance.getAssignation().getSalle().getNom() : "Salle non définie"));
         } catch (Exception e) {
             labelSeanceCours.setText("Séance #" + seance.getId());
@@ -239,38 +214,33 @@ public class PointageController {
         mettreAJourBoutons(seance);
     }
 
-    //  Activer/désactiver les boutons selon RG-01
     private void mettreAJourBoutons(SeancePlanifiee seance) {
         long ecart = ChronoUnit.MINUTES.between(LocalDateTime.now(), seance.getDateHeure());
-        // Fenêtre = [-15min avant, +5min après]
         boolean fenetreOuverte = (ecart <= 15 && ecart >= -5);
         boolean dejaRealisee   = seance.getStatut() == StatutSeance.REALISEE;
 
-        // Vérifier si pointage DEBUT existe déjà
         boolean debutExiste = pointageDAO.findBySeanceEtType(seance.getId(), TypePointage.DEBUT).isPresent();
         boolean finExiste   = pointageDAO.findBySeanceEtType(seance.getId(), TypePointage.FIN).isPresent();
 
         btnPointerDebut.setDisable(!fenetreOuverte || debutExiste);
         btnPointerFin.setDisable(!debutExiste || finExiste);
 
-        // Indicateur fenêtre
         if (ecart > 15) {
-            labelFenetreStatut.setText("🕐 Pas encore ouverte");
+            labelFenetreStatut.setText("Pas encore ouverte");
             labelFenetreStatut.setStyle("-fx-text-fill: #888;");
             labelEcartTemps.setText("Ouvre dans " + ecart + " min");
         } else if (ecart >= -5) {
-            labelFenetreStatut.setText("✅ Fenêtre ouverte");
+            labelFenetreStatut.setText("Fenêtre ouverte");
             labelFenetreStatut.setStyle("-fx-text-fill: #1E8449; -fx-font-weight: bold;");
             labelEcartTemps.setText(ecart >= 0 ? "Commence dans " + ecart + " min"
                 : "Démarrée il y a " + (-ecart) + " min");
         } else {
-            labelFenetreStatut.setText("⛔ Fenêtre fermée");
+            labelFenetreStatut.setText("Fenêtre fermée");
             labelFenetreStatut.setStyle("-fx-text-fill: #C0392B;");
             labelEcartTemps.setText("Dépassée de " + (-ecart - 5) + " min");
         }
     }
 
-    // Actions de pointage
     @FXML
     private void pointerDebut() {
         SeancePlanifiee seance = tableSeances.getSelectionModel().getSelectedItem();
@@ -299,15 +269,14 @@ public class PointageController {
 
     private void afficherResultatPointage(ResultatPointage resultat) {
         switch (resultat) {
-            case SUCCES      -> afficherMessage("✅ Pointage enregistré avec succès !", "#1E8449");
-            case EN_RETARD   -> afficherMessage("⚠ Pointage enregistré — vous êtes en retard. La scolarité a été notifiée.", "#D35400");
-            case TROP_TOT    -> afficherMessage("⛔ Trop tôt ! La fenêtre de pointage n'est pas encore ouverte (RG-01).", "#C0392B");
-            case PROF_INACTIF-> afficherMessage("⛔ Votre compte est inactif. Contactez la scolarité.", "#C0392B");
+            case SUCCES      -> afficherMessage("Pointage enregistré avec succès !", "#1E8449");
+            case EN_RETARD   -> afficherMessage(" Pointage enregistré — vous êtes en retard. La scolarité a été notifiée.", "#D35400");
+            case TROP_TOT    -> afficherMessage("Trop tôt ! La fenêtre de pointage n'est pas encore ouverte (RG-01).", "#C0392B");
+            case PROF_INACTIF-> afficherMessage("Votre compte est inactif. Contactez la scolarité.", "#C0392B");
         }
     }
 
     private void afficherMessage(String msg, String couleur) {
-        // 4.2 : si appelé depuis thread secondaire → Platform.runLater()
         Platform.runLater(() -> {
             labelMessage.setText(msg);
             labelMessage.setStyle("-fx-text-fill: " + couleur + ";");
@@ -317,6 +286,6 @@ public class PointageController {
     @FXML
     private void actualiser() {
         chargerSeances();
-        afficherMessage("🔄 Données actualisées", "#241654");
+        afficherMessage("Données actualisées", "#241654");
     }
 }
