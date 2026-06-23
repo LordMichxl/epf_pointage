@@ -13,7 +13,7 @@
           style="-fx-background-color: white; -fx-padding: 16 24 16 24;
                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
         <VBox>
-            <Label text="✅ Interface de Pointage" styleClass="page-title"/>
+            <Label text=" Interface de Pointage" styleClass="page-title"/>
             <Label fx:id="labelDate" text=""
                    style="-fx-text-fill: #888; -fx-font-size: 13px;"/>
         </VBox>
@@ -38,7 +38,7 @@
                 <Label fx:id="labelNbSeances" text="(0)"
                        style="-fx-text-fill: #888; -fx-font-size: 13px;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="🔄 Actualiser" styleClass="btn-secondary"
+                <Button text=" Actualiser" styleClass="btn-secondary"
                         onAction="#actualiser" style="-fx-pref-height: 32px;"/>
             </HBox>
 
@@ -89,7 +89,7 @@
             <VBox styleClass="card" spacing="12">
                 <Label text="Enregistrer ma présence" styleClass="section-title"/>
 
-                <Button fx:id="btnPointerDebut" text="▶  POINTER DÉBUT"
+                <Button fx:id="btnPointerDebut" text="  POINTER DÉBUT"
                         onAction="#pointerDebut"
                         style="-fx-pref-width: 9999px; -fx-pref-height: 48px;
                                -fx-font-size: 14px; -fx-font-weight: bold;
@@ -97,7 +97,7 @@
                                -fx-background-radius: 6px; -fx-cursor: hand;"
                         disable="true"/>
 
-                <Button fx:id="btnPointerFin" text="⏹  POINTER FIN"
+                <Button fx:id="btnPointerFin" text="  POINTER FIN"
                         onAction="#pointerFin"
                         style="-fx-pref-width: 9999px; -fx-pref-height: 48px;
                                -fx-font-size: 14px; -fx-font-weight: bold;
@@ -113,17 +113,17 @@
             <VBox styleClass="card" spacing="8">
                 <Label text="Récapitulatif du jour" styleClass="section-title"/>
                 <HBox spacing="8">
-                    <Label text="✅" style="-fx-font-size: 14px;"/>
+                    <Label text="" style="-fx-font-size: 14px;"/>
                     <Label fx:id="labelNbRealisees" text="0 séance(s) réalisée(s)"
                            style="-fx-font-size: 13px;"/>
                 </HBox>
                 <HBox spacing="8">
-                    <Label text="⏳" style="-fx-font-size: 14px;"/>
+                    <Label text="" style="-fx-font-size: 14px;"/>
                     <Label fx:id="labelNbEnAttente" text="0 séance(s) en attente"
                            style="-fx-font-size: 13px;"/>
                 </HBox>
                 <HBox spacing="8">
-                    <Label text="⚠" style="-fx-font-size: 14px;"/>
+                    <Label text="" style="-fx-font-size: 14px;"/>
                     <Label fx:id="labelNbRetards" text="0 retard(s) ce mois"
                            style="-fx-font-size: 13px; -fx-text-fill: #D35400;"/>
                 </HBox>

@@ -12,11 +12,11 @@
     <HBox alignment="CENTER_LEFT" spacing="16"
           style="-fx-background-color: white; -fx-padding: 16 24 16 24;
                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
-        <Label text="📊 Rapports Mensuels" styleClass="page-title"/>
+        <Label text=" Rapports Mensuels" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnGenererPDF" text="📄 Exporter PDF"
+        <Button fx:id="btnGenererPDF" text=" Exporter PDF"
                 styleClass="btn-secondary" onAction="#exporterPDF" disable="true"/>
-        <Button fx:id="btnValider" text="✔ Valider le rapport"
+        <Button fx:id="btnValider" text=" Valider le rapport"
                 styleClass="btn-primary" onAction="#validerRapport" disable="true"/>
     </HBox>
 
@@ -35,7 +35,7 @@
         <Label text="Année :" style="-fx-font-weight: bold;"/>
         <ComboBox fx:id="comboAnnee" style="-fx-pref-width: 100px;"/>
 
-        <Button text="🔍 Générer le rapport" styleClass="btn-primary"
+        <Button text=" Générer le rapport" styleClass="btn-primary"
                 onAction="#genererRapport" style="-fx-pref-height: 36px;"/>
 
         <Region HBox.hgrow="ALWAYS"/>

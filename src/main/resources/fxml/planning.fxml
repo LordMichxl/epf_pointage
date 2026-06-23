@@ -39,14 +39,14 @@
 
     <!-- Navigation de semaine + légende des couleurs -->
     <HBox spacing="12" alignment="CENTER_LEFT">
-        <Button text="◀" onAction="#semainePrecedente"/>
+        <Button text="" onAction="#semainePrecedente"/>
         <Label fx:id="labelSemaine" styleClass="section-title"/>
-        <Button text="▶" onAction="#semaineSuivante"/>
+        <Button text="" onAction="#semaineSuivante"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label text="● Planifiée" styleClass="legende-planifiee"/>
-        <Label text="● Réalisée" styleClass="legende-realisee"/>
-        <Label text="● Annulée" styleClass="legende-annulee"/>
-        <Label text="● Reportée" styleClass="legende-reportee"/>
+        <Label text=" Planifiée" styleClass="legende-planifiee"/>
+        <Label text=" Réalisée" styleClass="legende-realisee"/>
+        <Label text=" Annulée" styleClass="legende-annulee"/>
+        <Label text=" Reportée" styleClass="legende-reportee"/>
     </HBox>
 
     <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">

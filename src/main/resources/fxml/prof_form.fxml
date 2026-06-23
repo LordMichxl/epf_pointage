@@ -32,7 +32,7 @@
                     <ImageView fx:id="imagePhoto" fitWidth="140" fitHeight="140"
                                preserveRatio="true"
                                style="-fx-effect: dropshadow(gaussian,rgba(0,0,0,0.1),4,0,0,0);"/>
-                    <Button text="📷 Choisir une photo" styleClass="btn-secondary"
+                    <Button text=" Choisir une photo" styleClass="btn-secondary"
                             onAction="#choisirPhoto" style="-fx-pref-width: 160px;"/>
                     <Label fx:id="erreurPhoto" styleClass="error-label" text=""/>
                 </VBox>

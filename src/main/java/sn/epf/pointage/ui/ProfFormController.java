@@ -244,7 +244,7 @@ public class ProfFormController {
 
     private void marquerErreur(Control champ, Label erreur, String msg) {
         champ.setStyle(champ.getStyle() + "; -fx-border-color: #D0103A; -fx-border-width: 1.5px;");
-        erreur.setText("⚠ " + msg);
+        erreur.setText("" + msg);
     }
 
     private void retirerErreur(Control champ, Label erreur) {
