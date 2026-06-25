@@ -39,6 +39,7 @@
         <mapping class="sn.epf.pointage.model.PeriodiciteCours"/>
         <mapping class="sn.epf.pointage.model.RapportMensuel"/>
         <mapping class="sn.epf.pointage.model.Utilisateur"/>
+        <mapping class="sn.epf.pointage.model.JournalConnexion"/>
 
     </session-factory>
 </hibernate-configuration>

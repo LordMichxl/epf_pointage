@@ -63,35 +63,35 @@
                         <!-- Nom -->
                         <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
                             <Label text="Nom *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
-                            <TextField fx:id="champNom" promptText="Ex: Diallo"/>
+                            <TextField fx:id="champNom" promptText="Votre nom"/>
                             <Label fx:id="erreurNom" styleClass="error-label" text=""/>
                         </VBox>
 
                         <!-- Prénom -->
                         <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
                             <Label text="Prénom *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
-                            <TextField fx:id="champPrenom" promptText="Ex: Moussa"/>
+                            <TextField fx:id="champPrenom" promptText="Votre prénom"/>
                             <Label fx:id="erreurPrenom" styleClass="error-label" text=""/>
                         </VBox>
 
                         <!-- Email -->
                         <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
                             <Label text="Email *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
-                            <TextField fx:id="champEmail" promptText="prenom.nom@epf.sn"/>
+                            <TextField fx:id="champEmail" promptText="email: prenom.nom@epf.sn"/>
                             <Label fx:id="erreurEmail" styleClass="error-label" text=""/>
                         </VBox>
 
                         <!-- Téléphone -->
                         <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
                             <Label text="Téléphone" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
-                            <TextField fx:id="champTelephone" promptText="77 XXX XX XX"/>
+                            <TextField fx:id="champTelephone" promptText="tel: 77 XXX XX XX"/>
                             <Label fx:id="erreurTelephone" styleClass="error-label" text=""/>
                         </VBox>
 
                         <!-- Date embauche -->
                         <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
                             <Label text="Date d'embauche" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
-                            <DatePicker fx:id="dateEmbauche" style="-fx-pref-width: 9999px;"/>
+                            <DatePicker fx:id="dateEmbauche" promptText="Date d'embauche" style="-fx-pref-width: 9999px;"/>
                         </VBox>
                     </GridPane>
                 </VBox>
@@ -108,7 +108,7 @@
                         <!-- Type de contrat -->
                         <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
                             <Label text="Type de contrat *" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
-                            <ComboBox fx:id="comboContrat" style="-fx-pref-width: 9999px;"/>
+                            <ComboBox fx:id="comboContrat" promptText="Type de contrat " style="-fx-pref-width: 9999px;"/>
                             <Label fx:id="erreurContrat" styleClass="error-label" text=""/>
                         </VBox>
 

@@ -12,13 +12,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import sn.epf.pointage.dao.ProfesseurDAO;
 import sn.epf.pointage.model.Professeur;
+import sn.epf.pointage.context.SessionContext;
+import sn.epf.pointage.model.enums.Role;
 
 import java.io.IOException;
 import java.util.List;
 
 public class ProfesseursController {
 
-    @FXML private TableView<Professeur>          tableProfesseurs;
+    @FXML private TableView<Professeur>  tableProfesseurs;
     @FXML private TableColumn<Professeur,String> colMatricule;
     @FXML private TableColumn<Professeur,String> colNom;
     @FXML private TableColumn<Professeur,String> colPrenom;
@@ -28,11 +30,12 @@ public class ProfesseursController {
     @FXML private TableColumn<Professeur,String> colFiliere;
     @FXML private TableColumn<Professeur,String> colStatut;
     @FXML private TableColumn<Professeur,Void>   colActions;
-    @FXML private TextField                       champRecherche;
-    @FXML private ComboBox<String>                filtreContrat;
-    @FXML private ComboBox<String>                filtreFiliere;
-    @FXML private Label                           labelNbResultats;
-    @FXML private Button                          btnAjouter;
+    @FXML private TextField champRecherche;
+    @FXML private ComboBox<String> filtreContrat;
+    @FXML private ComboBox<String> filtreFiliere;
+    @FXML private Label labelNbResultats;
+    @FXML private Button tnAjouter;
+
 
     private final ProfesseurDAO professeurDAO = new ProfesseurDAO();
     private ObservableList<Professeur> listeProfesseurs;
@@ -55,8 +58,6 @@ public class ProfesseursController {
     }
 
     private void configurerColonnes() {
-        // ── Colonnes simples avec lambda → SimpleStringProperty ──
-        // C'est la bonne façon : on convertit chaque valeur en String explicitement
         colMatricule.setCellValueFactory(data ->
                 new SimpleStringProperty(data.getValue().getMatricule()));
 
@@ -125,6 +126,10 @@ public class ProfesseursController {
                         ouvrirFormulairePour(getTableView().getItems().get(getIndex())));
                 btnDesactiver.setOnAction(e ->
                         confirmerDesactivation(getTableView().getItems().get(getIndex())));
+                Role role = SessionContext.getInstance().getUtilisateurConnecte().getRole();
+                boolean estAdmin = (role == Role.ADMIN);
+                btnDesactiver.setVisible(estAdmin);
+                btnDesactiver.setManaged(estAdmin);
             }
 
             @Override

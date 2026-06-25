@@ -7,12 +7,14 @@ import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import sn.epf.pointage.context.SessionContext;
 import sn.epf.pointage.dao.*;
 import sn.epf.pointage.model.*;
 import sn.epf.pointage.model.enums.Frequence;
+import sn.epf.pointage.model.enums.Role;
 import sn.epf.pointage.model.enums.StatutSeance;
+import sn.epf.pointage.service.AccesService;
 import sn.epf.pointage.service.EnrolementService;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +39,8 @@ public class PlanningController {
     @FXML private GridPane grillePlanning;
     @FXML private Label labelSemaine;
 
+    private Utilisateur utilisateur;
+
     private final ProfesseurDAO professeurDAO = new ProfesseurDAO();
     private final AbstractDAO<Cours, Long> coursDAO = new AbstractDAO<>(Cours.class) {};
     private final AbstractDAO<Salle, Long> salleDAO = new AbstractDAO<>(Salle.class) {};
@@ -53,6 +57,7 @@ public class PlanningController {
 
     @FXML
     public void initialize() {
+        utilisateur = SessionContext.getInstance().getUtilisateurConnecte();
         comboJour.getItems().setAll(JOURS);
         comboJour.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -96,8 +101,14 @@ public class PlanningController {
         new Thread(() -> {
             LocalDateTime debutDateTime = debutSemaineAffichee.atStartOfDay();
             LocalDateTime finDateTime = finSemaine.atTime(23, 59, 59);
-            List<SeancePlanifiee> seances = seanceDAO.findEntreDates(debutDateTime, finDateTime);
+            List<SeancePlanifiee> seances;
 
+            if (utilisateur != null && utilisateur.getRole() == Role.PROFESSEUR) {
+                Long profId = utilisateur.getProfesseurLie().getId();
+                seances = seanceDAO.findEntreDatesEtProf(debutDateTime, finDateTime, profId);
+            } else {
+                seances = seanceDAO.findEntreDates(debutDateTime, finDateTime);
+            }
             Platform.runLater(() -> construireGrille(seances));
         }).start();
     }
@@ -198,6 +209,7 @@ public class PlanningController {
     }
 
     private void afficherMenuStatut(SeancePlanifiee seance, Pane source) {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         ContextMenu menu = new ContextMenu();
 
         MenuItem itemAnnuler = new MenuItem("Marquer ANNULÉE");
@@ -214,6 +226,7 @@ public class PlanningController {
     }
 
     private void changerStatut(SeancePlanifiee seance, StatutSeance nouveauStatut) {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         new Thread(() -> {
             try {
                 seance.setStatut(nouveauStatut);
@@ -252,6 +265,7 @@ public class PlanningController {
 
     @FXML
     public void creerAssignation() {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         try {
             PeriodiciteCours periodicite = new PeriodiciteCours();
             periodicite.setJourSemaine(comboJour.getValue());
@@ -282,6 +296,7 @@ public class PlanningController {
 
     @FXML
     public void ouvrirDialogueNouveauCours() {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         Dialog<Cours> dialog = new Dialog<>();
         dialog.setTitle("Nouveau cours");
         dialog.setHeaderText("Créer un nouveau cours");
@@ -340,6 +355,7 @@ public class PlanningController {
 
     @FXML
     public void ouvrirDialogueNouvelleSalle() {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         Dialog<Salle> dialog = new Dialog<>();
         dialog.setTitle("Nouvelle salle");
         dialog.setHeaderText("Créer une nouvelle salle");

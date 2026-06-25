@@ -132,6 +132,23 @@ public class SeanceDAO extends AbstractDAO<SeancePlanifiee, Long> {
                     .getResultList();
         }
     }
+    public List<SeancePlanifiee> findEntreDatesEtProf(
+            LocalDateTime debut,
+            LocalDateTime fin,
+            Long profId
+    ) {
+        try (Session session = getSession()) {
+            return session.createQuery("""
+            SELECT s FROM SeancePlanifiee s
+            WHERE s.dateHeure BETWEEN :debut AND :fin
+            AND s.assignation.professeur.id = :profId
+        """, SeancePlanifiee.class)
+                    .setParameter("debut", debut)
+                    .setParameter("fin", fin)
+                    .setParameter("profId", profId)
+                    .getResultList();
+        }
+    }
 
 
 }

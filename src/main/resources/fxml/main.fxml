@@ -21,10 +21,10 @@
 
             <Separator/>
 
-            <Button text="Tableau de bord" styleClass="sidebar-btn" onAction="#ouvrirDashboard" maxWidth="Infinity"/>
+            <Button fx:id="btnDashboard" text="Tableau de bord" styleClass="sidebar-btn" onAction="#ouvrirDashboard" maxWidth="Infinity"/>
             <Button fx:id="btnProfesseurs" text="Professeurs" styleClass="sidebar-btn" onAction="#ouvrirProfesseurs" maxWidth="Infinity"/>
             <Button fx:id="btnPlanning" text="Planning" styleClass="sidebar-btn" onAction="#ouvrirPlanning" maxWidth="Infinity"/>
-            <Button text="Mon Pointage" styleClass="sidebar-btn" onAction="#ouvrirPointage" maxWidth="Infinity"/>
+            <Button fx:id="btnPointage" text="Mon Pointage" styleClass="sidebar-btn" onAction="#ouvrirPointage" maxWidth="Infinity"/>
             <Button fx:id="btnRapports" text="Rapports" styleClass="sidebar-btn" onAction="#ouvrirRapports" maxWidth="Infinity"/>
 
             <Region VBox.vgrow="ALWAYS"/>

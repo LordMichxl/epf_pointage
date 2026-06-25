@@ -46,7 +46,7 @@ public class RapportsController {
     @FXML private Label labelProfMatricule;
     @FXML private Label labelProfContrat;
     @FXML private Label labelProfTaux;
-
+    private Utilisateur utilisateur;
     private final ProfesseurDAO professeurDAO = new ProfesseurDAO();
     private final SeanceDAO     seanceDAO     = new SeanceDAO();
     private final RapportService rapportService = new RapportService();

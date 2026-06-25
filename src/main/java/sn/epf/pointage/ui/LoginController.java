@@ -9,9 +9,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.mindrot.jbcrypt.BCrypt;
+import sn.epf.pointage.dao.AbstractDAO;
 import sn.epf.pointage.context.SessionContext;
 import sn.epf.pointage.dao.UtilisateurDAO;
 import sn.epf.pointage.model.Utilisateur;
+import sn.epf.pointage.model.JournalConnexion;
+import sn.epf.pointage.model.enums.TypeAction;
+import sn.epf.pointage.util.ReseauUtils;
 
 import java.io.IOException;
 
@@ -23,6 +27,9 @@ public class LoginController {
     @FXML private Button btnConnexion;
 
     private final UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
+
+    private final AbstractDAO<JournalConnexion, Long> journalDAO =
+            new AbstractDAO<>(JournalConnexion.class) {};
 
     @FXML
     public void seConnecter() {
@@ -42,6 +49,7 @@ public class LoginController {
         }
 
         SessionContext.getInstance().connecter(utilisateur);
+        journaliserConnexion(utilisateur);
 
         ouvrirApplicationPrincipale();
     }
@@ -49,6 +57,10 @@ public class LoginController {
     private void afficherErreur(String message) {
         messageErreur.setText(message);
         messageErreur.setVisible(true);
+    }
+    private void journaliserConnexion(Utilisateur utilisateur) {
+        String ip = ReseauUtils.getIpLocalAddress();
+        journalDAO.save(new JournalConnexion(utilisateur, ip, TypeAction.CONNEXION));
     }
 
     private void ouvrirApplicationPrincipale() {

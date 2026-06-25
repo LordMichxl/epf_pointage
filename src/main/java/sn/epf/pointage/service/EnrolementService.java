@@ -1,5 +1,6 @@
 package sn.epf.pointage.service;
 
+import javafx.scene.control.Alert;
 import org.mindrot.jbcrypt.BCrypt;
 import sn.epf.pointage.dao.*;
 import sn.epf.pointage.model.*;
@@ -24,6 +25,7 @@ public class EnrolementService {
             new AbstractDAO<>(Utilisateur.class) {};
 
     public Professeur enrollerProfesseur(Professeur prof, String motDePasse) {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
 
         if (prof.getNom() == null || prof.getNom().isBlank())
             throw new IllegalArgumentException("Le nom est obligatoire");
@@ -50,13 +52,20 @@ public class EnrolementService {
     }
 
     public void desactiverProfesseur(Long id) {
-        Professeur prof = professeurDAO.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Professeur introuvable"));
-        prof.setActif(false);
-        professeurDAO.update(prof);
+        AccesService.exigerRole(Role.ADMIN);
+        try {
+            Professeur prof = professeurDAO.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Professeur introuvable"));
+            prof.setActif(false);
+            professeurDAO.update(prof);
+        }catch (SecurityException e) {
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).showAndWait();
+        }
+
     }
 
     public Professeur mettreAJourProfil(Professeur profModifie) {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         professeurDAO.findByEmail(profModifie.getEmail()).ifPresent(existing -> {
             if (!existing.getId().equals(profModifie.getId())) {
                 throw new IllegalArgumentException("Email déjà utilisé par un autre professeur");
@@ -74,7 +83,7 @@ public class EnrolementService {
             PeriodiciteCours periodicite,
             LocalDate debutSemestre,
             LocalDate finSemestre) {
-
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         Assignation assignation = new Assignation();
         assignation.setProfesseur(professeur);
         assignation.setCours(cours);

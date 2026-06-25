@@ -31,11 +31,15 @@ public class ProfesseurDAO extends AbstractDAO<Professeur, Long> {
 
     public List<Professeur> findAllActifs() {
         try (Session session = getSession()) {
-            return session.createQuery(
-                "FROM Professeur p WHERE p.actif = true ORDER BY p.nom", Professeur.class)
-                .getResultList();
+            List<Professeur> resultList = session.createQuery(
+                            "SELECT p FROM Professeur p" +
+                                    "LEFT JOIN FETCH p.user" +
+                                    "WHERE p.actif = true", Professeur.class)
+                    .getResultList();
+            return resultList;
         }
     }
+    
 
     public Optional<Professeur> findByEmail(String email) {
         try (Session session = getSession()) {

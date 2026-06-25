@@ -14,7 +14,7 @@ public class RapportService {
             new AbstractDAO<>(RapportMensuel.class) {};
 
     public RapportMensuel genererRapportMensuel(Long professeurId, int mois, int annee) {
-
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         Professeur prof = professeurDAO.findById(professeurId)
                 .orElseThrow(() -> new IllegalArgumentException("Professeur introuvable"));
 
@@ -55,6 +55,7 @@ public class RapportService {
     }
 
     public void validerRapport(Long rapportId) {
+        AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         RapportMensuel rapport = rapportDAO.findById(rapportId)
                 .orElseThrow(() -> new IllegalArgumentException("Rapport introuvable"));
         rapport.setStatut(StatutRapport.VALIDE);
@@ -63,6 +64,7 @@ public class RapportService {
     }
 
     public void marquerCommePaye(Long rapportId) {
+        AccesService.exigerRole(Role.ADMIN);
         RapportMensuel rapport = rapportDAO.findById(rapportId)
                 .orElseThrow(() -> new IllegalArgumentException("Rapport introuvable"));
 

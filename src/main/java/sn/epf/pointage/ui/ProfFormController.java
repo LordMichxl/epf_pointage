@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.mindrot.jbcrypt.BCrypt;
 import sn.epf.pointage.dao.ProfesseurDAO;
+import sn.epf.pointage.dao.UtilisateurDAO;
 import sn.epf.pointage.model.Professeur;
 import sn.epf.pointage.model.Utilisateur;
 import sn.epf.pointage.model.enums.Role;
@@ -54,6 +55,7 @@ public class ProfFormController {
     @FXML private Label erreurPhoto;
 
     private final ProfesseurDAO dao = new ProfesseurDAO();
+    private final UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
 
     // null = création, non null = modification
     private Professeur professeurAModifier;
@@ -178,11 +180,11 @@ public class ProfFormController {
         p.setDateEmbauche(dateEmbauche.getValue());
         p.setPhoto(cheminPhoto);
         p.setActif(true);
-
-        Professeur saved = dao.save(p);
         String hash = BCrypt.hashpw(champMotDePasse.getText(), BCrypt.gensalt());
         Utilisateur u = new Utilisateur(champLogin.getText().trim(), hash, Role.PROFESSEUR);
+        Professeur saved = dao.save(p);
         u.setProfesseurLie(saved);
+        utilisateurDAO.save(u);
     }
 
     private void modifierProfesseur() {
