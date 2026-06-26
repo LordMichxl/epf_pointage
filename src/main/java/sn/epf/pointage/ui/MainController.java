@@ -5,33 +5,35 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-import sn.epf.pointage.context.SessionContext;
-import sn.epf.pointage.model.Utilisateur;
-import sn.epf.pointage.model.enums.Role;
-import sn.epf.pointage.dao.AbstractDAO;
-import sn.epf.pointage.model.JournalConnexion;
-import sn.epf.pointage.model.enums.TypeAction;
-import sn.epf.pointage.util.ReseauUtils;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.scene.control.Alert;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.util.Duration;
+import sn.epf.pointage.context.SessionContext;
+import sn.epf.pointage.dao.AbstractDAO;
+import sn.epf.pointage.model.JournalConnexion;
+import sn.epf.pointage.model.Utilisateur;
+import sn.epf.pointage.model.enums.Role;
+import sn.epf.pointage.model.enums.TypeAction;
+import sn.epf.pointage.util.ReseauUtils;
+
 import java.io.IOException;
 
 public class MainController {
 
     @FXML private StackPane contentArea;
-    @FXML private Label labelUtilisateur;
-    @FXML private Button btnProfesseurs;
-    @FXML private Button btnDashboard;
-    @FXML private Button btnPlanning;
-    @FXML private Button btnPointage;
+    @FXML private Label     labelUtilisateur;
+    @FXML private Button    btnDashboard;
+    @FXML private Button    btnProfesseurs;
+    @FXML private Button    btnPlanning;
+    @FXML private Button    btnPointage;
+    @FXML private Button    btnRapports;
 
     private final AbstractDAO<JournalConnexion, Long> journalDAO =
             new AbstractDAO<>(JournalConnexion.class) {};
@@ -85,7 +87,7 @@ public class MainController {
 
     private void journaliserDeconnexion() {
         Utilisateur u = SessionContext.getInstance().getUtilisateurConnecte();
-        if (u == null) return; // déjà déconnecté → on évite un doublon
+        if (u == null) return;
         new Thread(() -> {
             String ip = ReseauUtils.getIpLocalAddress();
             journalDAO.save(new JournalConnexion(u, ip, TypeAction.DECONNEXION));
@@ -122,19 +124,28 @@ public class MainController {
 
     private void configurerPourRole(Utilisateur u) {
         Role role = u.getRole();
-        boolean estProf = (role == Role.PROFESSEUR);
 
-        boolean peutVoirDashboard = (role == Role.ADMIN || role == Role.SCOLARITE);
-        btnDashboard.setVisible(peutVoirDashboard);
-        btnDashboard.setManaged(peutVoirDashboard);
+        boolean voirDashboard = (role == Role.ADMIN || role == Role.SCOLARITE);
+        afficherBouton(btnDashboard, voirDashboard);
 
-        boolean peutVoirProfesseurs = (role == Role.ADMIN || role == Role.SCOLARITE);
-        btnProfesseurs.setVisible(peutVoirProfesseurs);
-        btnProfesseurs.setManaged(peutVoirProfesseurs);
+        boolean voirProfesseurs = (role == Role.ADMIN || role == Role.SCOLARITE);
+        afficherBouton(btnProfesseurs, voirProfesseurs);
 
-        boolean aUnProfesseurLie = (u.getProfesseurLie() != null);
-        btnPointage.setVisible(aUnProfesseurLie);
-        btnPointage.setManaged(aUnProfesseurLie);
+        boolean voirPlanning = (role == Role.ADMIN || role == Role.SCOLARITE);
+        afficherBouton(btnPlanning, voirPlanning);
 
+        boolean voirPointage = (u.getProfesseurLie() != null);
+        afficherBouton(btnPointage, voirPointage);
+
+        if (btnRapports != null) {
+            afficherBouton(btnRapports, true);
+        }
+    }
+
+
+    private void afficherBouton(Button btn, boolean visible) {
+        if (btn == null) return;
+        btn.setVisible(visible);
+        btn.setManaged(visible);
     }
 }

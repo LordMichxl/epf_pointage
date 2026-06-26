@@ -15,6 +15,7 @@ import sn.epf.pointage.model.enums.Role;
 import sn.epf.pointage.model.enums.StatutSeance;
 import sn.epf.pointage.service.AccesService;
 import sn.epf.pointage.service.EnrolementService;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,88 +28,159 @@ import java.util.Locale;
 public class PlanningController {
 
     @FXML private ComboBox<Professeur> comboProfesseur;
-    @FXML private ComboBox<Cours> comboCours;
-    @FXML private ComboBox<Salle> comboSalle;
-    @FXML private ComboBox<DayOfWeek> comboJour;
-    @FXML private TextField champHeureDebut;
-    @FXML private TextField champHeureFin;
-    @FXML private ComboBox<Frequence> comboFrequence;
-    @FXML private DatePicker champDebutSemestre;
-    @FXML private DatePicker champFinSemestre;
-    @FXML private Label messageResultat;
-    @FXML private GridPane grillePlanning;
-    @FXML private Label labelSemaine;
+    @FXML private ComboBox<Cours>      comboCours;
+    @FXML private ComboBox<Salle>      comboSalle;
+    @FXML private ComboBox<DayOfWeek>  comboJour;
+    @FXML private TextField            champHeureDebut;
+    @FXML private TextField            champHeureFin;
+    @FXML private ComboBox<Frequence>  comboFrequence;
+    @FXML private DatePicker           champDebutSemestre;
+    @FXML private DatePicker           champFinSemestre;
+    @FXML private Label                messageResultat;
+    @FXML private GridPane             grillePlanning;
+    @FXML private Label                labelSemaine;
 
     private Utilisateur utilisateur;
 
-    private final ProfesseurDAO professeurDAO = new ProfesseurDAO();
-    private final AbstractDAO<Cours, Long> coursDAO = new AbstractDAO<>(Cours.class) {};
-    private final AbstractDAO<Salle, Long> salleDAO = new AbstractDAO<>(Salle.class) {};
-    private final SeanceDAO seanceDAO = new SeanceDAO();
-    private final EnrolementService enrolementService = new EnrolementService();
-    private static final int HEURE_DEBUT_GRILLE = 8;
-    private static final int HEURE_FIN_GRILLE   = 18;
+    private final ProfesseurDAO                professeurDAO    = new ProfesseurDAO();
+    private final AbstractDAO<Cours, Long>     coursDAO         = new AbstractDAO<>(Cours.class) {};
+    private final AbstractDAO<Salle, Long>     salleDAO         = new AbstractDAO<>(Salle.class) {};
+    private final SeanceDAO                    seanceDAO        = new SeanceDAO();
+    private final EnrolementService            enrolementService = new EnrolementService();
 
+    private static final int         HEURE_DEBUT_GRILLE = 8;
+    private static final int         HEURE_FIN_GRILLE   = 18;
     private static final DayOfWeek[] JOURS = {
             DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
             DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY
     };
+
     private LocalDate debutSemaineAffichee;
 
     @FXML
     public void initialize() {
         utilisateur = SessionContext.getInstance().getUtilisateurConnecte();
+
         comboJour.getItems().setAll(JOURS);
         comboJour.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(DayOfWeek item, boolean empty) {
+            @Override protected void updateItem(DayOfWeek item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    String nom = item.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.FRENCH);
-                    setText(nom.substring(0, 1).toUpperCase() + nom.substring(1));
-                }
+                if (empty || item == null) { setText(null); return; }
+                String nom = item.getDisplayName(java.time.format.TextStyle.FULL, Locale.FRENCH);
+                setText(nom.substring(0, 1).toUpperCase() + nom.substring(1));
             }
         });
         comboJour.setButtonCell(comboJour.getCellFactory().call(null));
+
         comboFrequence.getItems().setAll(Frequence.values());
+
         chargerListesDeroulantes();
-        debutSemaineAffichee = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        debutSemaineAffichee = LocalDate.now()
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         rafraichirGrille();
     }
 
-    @FXML
-    public void semainePrecedente() {
+    private void configurerCellFactories() {
+
+        comboProfesseur.setCellFactory(lv -> new ListCell<>() {
+            @Override protected void updateItem(Professeur p, boolean empty) {
+                super.updateItem(p, empty);
+                setText(empty || p == null ? null : p.getNom() + " " + p.getPrenom());
+            }
+        });
+        comboProfesseur.setButtonCell(new ListCell<>() {
+            @Override protected void updateItem(Professeur p, boolean empty) {
+                super.updateItem(p, empty);
+                setText(empty || p == null ? "Professeur" : p.getNom() + " " + p.getPrenom());
+            }
+        });
+
+        comboCours.setCellFactory(lv -> new ListCell<>() {
+            @Override protected void updateItem(Cours c, boolean empty) {
+                super.updateItem(c, empty);
+                setText(empty || c == null ? null : c.getCode() + " - " + c.getIntitule());
+            }
+        });
+        comboCours.setButtonCell(new ListCell<>() {
+            @Override protected void updateItem(Cours c, boolean empty) {
+                super.updateItem(c, empty);
+                setText(empty || c == null ? "Cours" : c.getCode() + " - " + c.getIntitule());
+            }
+        });
+
+        comboSalle.setCellFactory(lv -> new ListCell<>() {
+            @Override protected void updateItem(Salle s, boolean empty) {
+                super.updateItem(s, empty);
+                if (empty || s == null) { setText(null); return; }
+                String cap = s.getCapacite() != null ? " (" + s.getCapacite() + " pl.)" : "";
+                setText(s.getNom() + cap);
+            }
+        });
+        comboSalle.setButtonCell(new ListCell<>() {
+            @Override protected void updateItem(Salle s, boolean empty) {
+                super.updateItem(s, empty);
+                if (empty || s == null) { setText("Salle"); return; }
+                String cap = s.getCapacite() != null ? " (" + s.getCapacite() + " pl.)" : "";
+                setText(s.getNom() + cap);
+            }
+        });
+    }
+
+    private void chargerListesDeroulantes() {
+
+        configurerCellFactories();
+
+        new Thread(() -> {
+            List<Professeur> profs  = professeurDAO.findAllActifs();
+            List<Cours>      cours  = coursDAO.findAll();
+            List<Salle>      salles = salleDAO.findAll();
+
+            Platform.runLater(() -> {
+                comboProfesseur.setItems(FXCollections.observableArrayList(profs));
+                comboCours.setItems(FXCollections.observableArrayList(cours));
+                comboSalle.setItems(FXCollections.observableArrayList(salles));
+            });
+        }).start();
+    }
+
+    @FXML public void semainePrecedente() {
         debutSemaineAffichee = debutSemaineAffichee.minusWeeks(1);
         rafraichirGrille();
     }
 
-    @FXML
-    public void semaineSuivante() {
+    @FXML public void semaineSuivante() {
         debutSemaineAffichee = debutSemaineAffichee.plusWeeks(1);
         rafraichirGrille();
     }
 
-
     private void rafraichirGrille() {
-        LocalDate finSemaine = debutSemaineAffichee.plusDays(JOURS.length-1);
-
-        DateTimeFormatter fmtJour = DateTimeFormatter.ofPattern("dd/MM",java.util.Locale.FRENCH);
+        LocalDate finSemaine = debutSemaineAffichee.plusDays(JOURS.length - 1);
+        DateTimeFormatter fmtJour = DateTimeFormatter.ofPattern("dd/MM", Locale.FRENCH);
         labelSemaine.setText("Semaine du " + debutSemaineAffichee.format(fmtJour)
-                + " au " + debutSemaineAffichee.plusDays(JOURS.length - 1).format(fmtJour));
+                + " au " + finSemaine.format(fmtJour));
 
         new Thread(() -> {
             LocalDateTime debutDateTime = debutSemaineAffichee.atStartOfDay();
-            LocalDateTime finDateTime = finSemaine.atTime(23, 59, 59);
+            LocalDateTime finDateTime   = finSemaine.atTime(23, 59, 59);
             List<SeancePlanifiee> seances;
 
             if (utilisateur != null && utilisateur.getRole() == Role.PROFESSEUR) {
-                Long profId = utilisateur.getProfesseurLie().getId();
-                seances = seanceDAO.findEntreDatesEtProf(debutDateTime, finDateTime, profId);
+                Long profId = null;
+                try {
+                    if (utilisateur.getProfesseurLie() != null) {
+                        profId = utilisateur.getProfesseurLie().getId();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Lazy loading getProfesseurLie : " + e.getMessage());
+                }
+                seances = (profId != null)
+                        ? seanceDAO.findEntreDatesEtProf(debutDateTime, finDateTime, profId)
+                        : List.of();
             } else {
                 seances = seanceDAO.findEntreDates(debutDateTime, finDateTime);
             }
+
             Platform.runLater(() -> construireGrille(seances));
         }).start();
     }
@@ -118,8 +190,8 @@ public class PlanningController {
         grillePlanning.getColumnConstraints().clear();
         grillePlanning.getRowConstraints().clear();
 
-        ColumnConstraints colHeures = new ColumnConstraints(70);
-        grillePlanning.getColumnConstraints().add(colHeures);
+        grillePlanning.getColumnConstraints().add(new ColumnConstraints(70));
+
         for (int i = 0; i < JOURS.length; i++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setPrefWidth(150);
@@ -128,6 +200,7 @@ public class PlanningController {
         }
 
         grillePlanning.add(new Label(""), 0, 0);
+
         DateTimeFormatter fmtEntete = DateTimeFormatter.ofPattern("EEE dd/MM", Locale.FRENCH);
         for (int j = 0; j < JOURS.length; j++) {
             LocalDate dateJour = debutSemaineAffichee.plusDays(j);
@@ -139,28 +212,26 @@ public class PlanningController {
         }
 
         int nbLignes = HEURE_FIN_GRILLE - HEURE_DEBUT_GRILLE;
-        RowConstraints rowEntete = new RowConstraints(40);
-        grillePlanning.getRowConstraints().add(rowEntete);
+        grillePlanning.getRowConstraints().add(new RowConstraints(40));
 
         for (int h = 0; h < nbLignes; h++) {
-            RowConstraints row = new RowConstraints(60);
-            grillePlanning.getRowConstraints().add(row);
-
+            grillePlanning.getRowConstraints().add(new RowConstraints(60));
             Label labelHeure = new Label(String.format("%02d:00", HEURE_DEBUT_GRILLE + h));
             labelHeure.getStyleClass().add("grille-label-heure");
             grillePlanning.add(labelHeure, 0, h + 1);
         }
 
         for (SeancePlanifiee seance : seances) {
-
             DayOfWeek jourSeance = seance.getDateHeure().getDayOfWeek();
             int colonne = indexDuJour(jourSeance);
             if (colonne == -1) continue;
 
             int heureDebut = seance.getDateHeure().getHour();
-            int ligne = heureDebut - HEURE_DEBUT_GRILLE;
+            int ligne      = heureDebut - HEURE_DEBUT_GRILLE;
             if (ligne < 0 || ligne >= nbLignes) continue;
-            int rowSpan = Math.max(1, (int) Math.ceil(seance.getDureeMinutes() / 60.0));
+
+            int rowSpan = Math.max(1,
+                    (int) Math.ceil(seance.getDureeMinutes() / 60.0));
 
             Pane bloc = creerBlocSeance(seance);
             grillePlanning.add(bloc, colonne + 1, ligne + 1, 1, rowSpan);
@@ -212,13 +283,12 @@ public class PlanningController {
         AccesService.exigerRole(Role.ADMIN, Role.SCOLARITE);
         ContextMenu menu = new ContextMenu();
 
-        MenuItem itemAnnuler = new MenuItem("Marquer ANNULÉE");
-        itemAnnuler.setOnAction(e -> changerStatut(seance, StatutSeance.ANNULEE));
-
-        MenuItem itemReporter = new MenuItem("Marquer REPORTÉE");
-        itemReporter.setOnAction(e -> changerStatut(seance, StatutSeance.REPORTEE));
-
+        MenuItem itemAnnuler    = new MenuItem("Marquer ANNULÉE");
+        MenuItem itemReporter   = new MenuItem("Marquer REPORTÉE");
         MenuItem itemReplanifier = new MenuItem("Remettre PLANIFIÉE");
+
+        itemAnnuler.setOnAction(e    -> changerStatut(seance, StatutSeance.ANNULEE));
+        itemReporter.setOnAction(e   -> changerStatut(seance, StatutSeance.REPORTEE));
         itemReplanifier.setOnAction(e -> changerStatut(seance, StatutSeance.PLANIFIEE));
 
         menu.getItems().addAll(itemAnnuler, itemReporter, itemReplanifier);
@@ -231,35 +301,18 @@ public class PlanningController {
             try {
                 seance.setStatut(nouveauStatut);
                 seanceDAO.updateStatut(seance.getId(), nouveauStatut);
-
                 Platform.runLater(() -> {
-                    if (messageResultat != null) {
+                    if (messageResultat != null)
                         messageResultat.setText("Statut mis à jour avec succès !");
-                    }
                     rafraichirGrille();
                 });
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
-                    if (messageResultat != null) {
+                    if (messageResultat != null)
                         messageResultat.setText("Erreur lors du changement de statut.");
-                    }
                 });
             }
-        }).start();
-    }
-
-
-    private void chargerListesDeroulantes() {
-        new Thread(() -> {
-            List<Professeur> profs = professeurDAO.findAllActifs();
-            List<Cours> cours = coursDAO.findAll();
-            List<Salle> salles = salleDAO.findAll();
-            Platform.runLater(() -> {
-                comboProfesseur.setItems(FXCollections.observableArrayList(profs));
-                comboCours.setItems(FXCollections.observableArrayList(cours));
-                comboSalle.setItems(FXCollections.observableArrayList(salles));
-            });
         }).start();
     }
 
@@ -286,11 +339,12 @@ public class PlanningController {
                     champFinSemestre.getValue()
             );
 
-            messageResultat.setText("Assignation créée et séances générées");
+            messageResultat.setText("Assignation créée et séances générées !");
             rafraichirGrille();
 
         } catch (Exception e) {
-            messageResultat.setText(e.getMessage());
+            messageResultat.setText("Erreur : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -304,34 +358,26 @@ public class PlanningController {
         ButtonType btnCreer = new ButtonType("Créer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnCreer, ButtonType.CANCEL);
 
-        TextField champCode = new TextField();
-        champCode.setPromptText("Ex: INFO301");
-        TextField champIntitule = new TextField();
-        champIntitule.setPromptText("Ex: Algorithmique Avancée");
-        TextField champVolume = new TextField();
-        champVolume.setPromptText("Ex: 45");
-        TextField champNiveau = new TextField();
-        champNiveau.setPromptText("Ex: L3");
-        TextField champFiliere = new TextField();
-        champFiliere.setPromptText("Ex: CSI");
-        TextField champSemestre = new TextField();
-        champSemestre.setPromptText("Ex: 1");
+        TextField champCode      = new TextField(); champCode.setPromptText("Ex: INFO301");
+        TextField champIntitule  = new TextField(); champIntitule.setPromptText("Ex: Algorithmique Avancée");
+        TextField champVolume    = new TextField(); champVolume.setPromptText("Ex: 45");
+        TextField champNiveau    = new TextField(); champNiveau.setPromptText("Ex: L3");
+        TextField champFiliere   = new TextField(); champFiliere.setPromptText("Ex: CSI");
+        TextField champSemestre  = new TextField(); champSemestre.setPromptText("Ex: 1");
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.addRow(0, new Label("Code *"), champCode);
-        grid.addRow(1, new Label("Intitulé *"), champIntitule);
-        grid.addRow(2, new Label("Volume horaire"), champVolume);
-        grid.addRow(3, new Label("Niveau"), champNiveau);
-        grid.addRow(4, new Label("Filière"), champFiliere);
-        grid.addRow(5, new Label("Semestre"), champSemestre);
+        grid.setHgap(10); grid.setVgap(10);
+        grid.addRow(0, new Label("Code *"),           champCode);
+        grid.addRow(1, new Label("Intitulé *"),       champIntitule);
+        grid.addRow(2, new Label("Volume horaire"),   champVolume);
+        grid.addRow(3, new Label("Niveau"),           champNiveau);
+        grid.addRow(4, new Label("Filière"),          champFiliere);
+        grid.addRow(5, new Label("Semestre"),         champSemestre);
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(bouton -> {
-            if (bouton != btnCreer) return null;
-            if (champCode.getText().isBlank() || champIntitule.getText().isBlank()) return null;
-
+            if (bouton != btnCreer || champCode.getText().isBlank()
+                    || champIntitule.getText().isBlank()) return null;
             Cours cours = new Cours();
             cours.setCode(champCode.getText());
             cours.setIntitule(champIntitule.getText());
@@ -340,8 +386,7 @@ public class PlanningController {
             try {
                 cours.setVolumeHoraireTotal(Integer.parseInt(champVolume.getText()));
                 cours.setSemestre(Integer.parseInt(champSemestre.getText()));
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
             return cours;
         });
 
@@ -363,27 +408,21 @@ public class PlanningController {
         ButtonType btnCreer = new ButtonType("Créer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnCreer, ButtonType.CANCEL);
 
-        TextField champNom = new TextField();
-        champNom.setPromptText("Ex: Salle A12");
-        TextField champCapacite = new TextField();
-        champCapacite.setPromptText("Ex: 40");
-        TextField champBatiment = new TextField();
-        champBatiment.setPromptText("Ex: Bâtiment A");
-        TextField champEquipements = new TextField();
-        champEquipements.setPromptText("Ex: Vidéoprojecteur");
+        TextField champNom         = new TextField(); champNom.setPromptText("Ex: Salle A12");
+        TextField champCapacite    = new TextField(); champCapacite.setPromptText("Ex: 40");
+        TextField champBatiment    = new TextField(); champBatiment.setPromptText("Ex: Bâtiment A");
+        TextField champEquipements = new TextField(); champEquipements.setPromptText("Ex: Vidéoprojecteur");
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.addRow(0, new Label("Nom *"), champNom);
-        grid.addRow(1, new Label("Capacité"), champCapacite);
-        grid.addRow(2, new Label("Bâtiment"), champBatiment);
-        grid.addRow(3, new Label("Équipements"), champEquipements);
+        grid.setHgap(10); grid.setVgap(10);
+        grid.addRow(0, new Label("Nom *"),         champNom);
+        grid.addRow(1, new Label("Capacité"),      champCapacite);
+        grid.addRow(2, new Label("Bâtiment"),      champBatiment);
+        grid.addRow(3, new Label("Équipements"),   champEquipements);
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(bouton -> {
             if (bouton != btnCreer || champNom.getText().isBlank()) return null;
-
             Salle salle = new Salle();
             salle.setNom(champNom.getText());
             salle.setBatiment(champBatiment.getText());
