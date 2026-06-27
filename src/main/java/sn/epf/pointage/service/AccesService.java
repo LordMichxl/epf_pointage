@@ -16,7 +16,7 @@ public class AccesService {
         }
 
         for (Role role : rolesAutorises) {
-            if (u.getRole() == role) return; // rôle trouvé → autorisé
+            if (u.getRole() == role) return;
         }
 
         throw new SecurityException(

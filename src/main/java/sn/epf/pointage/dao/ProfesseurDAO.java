@@ -31,12 +31,9 @@ public class ProfesseurDAO extends AbstractDAO<Professeur, Long> {
 
     public List<Professeur> findAllActifs() {
         try (Session session = getSession()) {
-            List<Professeur> resultList = session.createQuery(
-                            "SELECT p FROM Professeur p" +
-                                    "LEFT JOIN FETCH p.user" +
-                                    "WHERE p.actif = true", Professeur.class)
+            return session.createQuery(
+                            "FROM Professeur p WHERE p.actif = true ORDER BY p.nom", Professeur.class)
                     .getResultList();
-            return resultList;
         }
     }
     

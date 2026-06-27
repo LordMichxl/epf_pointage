@@ -153,3 +153,7 @@
 .legende-reportee  { -fx-text-fill: #D35400; -fx-font-size: 11px; }
 
 .champ-erreur { -fx-border-color: -epf-accent; -fx-border-width: 1.5px; }
+
+.bloc-lecture-seule {
+    -fx-cursor: default;
+}

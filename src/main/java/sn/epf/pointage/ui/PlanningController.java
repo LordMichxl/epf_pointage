@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class PlanningController {
-
+    @FXML private TitledPane paneNouvelleAssignation;
     @FXML private ComboBox<Professeur> comboProfesseur;
     @FXML private ComboBox<Cours>      comboCours;
     @FXML private ComboBox<Salle>      comboSalle;
@@ -56,11 +56,18 @@ public class PlanningController {
     };
 
     private LocalDate debutSemaineAffichee;
-
+    private boolean estProfesseur;
+    private Long profConnecteId;
     @FXML
     public void initialize() {
-        utilisateur = SessionContext.getInstance().getUtilisateurConnecte();
-
+        Utilisateur u = SessionContext.getInstance().getUtilisateurConnecte();
+        estProfesseur = (u.getRole() == Role.PROFESSEUR);
+        profConnecteId = estProfesseur ? u.getProfesseurLie().getId() : null;
+        paneNouvelleAssignation.setVisible(!estProfesseur);
+        paneNouvelleAssignation.setManaged(!estProfesseur);
+        if (!estProfesseur) {
+            chargerListesDeroulantes();
+        }
         comboJour.getItems().setAll(JOURS);
         comboJour.setCellFactory(param -> new ListCell<>() {
             @Override protected void updateItem(DayOfWeek item, boolean empty) {
@@ -163,25 +170,16 @@ public class PlanningController {
         new Thread(() -> {
             LocalDateTime debutDateTime = debutSemaineAffichee.atStartOfDay();
             LocalDateTime finDateTime   = finSemaine.atTime(23, 59, 59);
-            List<SeancePlanifiee> seances;
+            List<SeancePlanifiee> seances = seanceDAO.findEntreDates(debutDateTime, finDateTime);
 
-            if (utilisateur != null && utilisateur.getRole() == Role.PROFESSEUR) {
-                Long profId = null;
-                try {
-                    if (utilisateur.getProfesseurLie() != null) {
-                        profId = utilisateur.getProfesseurLie().getId();
-                    }
-                } catch (Exception e) {
-                    System.err.println("Lazy loading getProfesseurLie : " + e.getMessage());
-                }
-                seances = (profId != null)
-                        ? seanceDAO.findEntreDatesEtProf(debutDateTime, finDateTime, profId)
-                        : List.of();
-            } else {
-                seances = seanceDAO.findEntreDates(debutDateTime, finDateTime);
+            if (estProfesseur) {
+                seances = seances.stream()
+                        .filter(s -> s.getAssignation().getProfesseur().getId().equals(profConnecteId))
+                        .toList();
+
             }
-
-            Platform.runLater(() -> construireGrille(seances));
+            List<SeancePlanifiee> seancesFinales = seances;
+            Platform.runLater(() -> construireGrille(seancesFinales));
         }).start();
     }
 
@@ -265,6 +263,11 @@ public class PlanningController {
                         + "Statut : " + seance.getStatut()
         );
         Tooltip.install(bloc, tooltip);
+        if (!estProfesseur) {
+            bloc.setOnMouseClicked(e -> afficherMenuStatut(seance, bloc));
+        } else {
+            bloc.getStyleClass().add("bloc-lecture-seule");
+        }
         bloc.setOnMouseClicked(e -> afficherMenuStatut(seance, bloc));
 
         return bloc;

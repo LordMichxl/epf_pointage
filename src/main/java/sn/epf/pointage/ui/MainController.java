@@ -131,15 +131,9 @@ public class MainController {
         boolean voirProfesseurs = (role == Role.ADMIN || role == Role.SCOLARITE);
         afficherBouton(btnProfesseurs, voirProfesseurs);
 
-        boolean voirPlanning = (role == Role.ADMIN || role == Role.SCOLARITE);
-        afficherBouton(btnPlanning, voirPlanning);
-
         boolean voirPointage = (u.getProfesseurLie() != null);
         afficherBouton(btnPointage, voirPointage);
 
-        if (btnRapports != null) {
-            afficherBouton(btnRapports, true);
-        }
     }
 
 

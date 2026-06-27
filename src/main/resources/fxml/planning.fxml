@@ -11,7 +11,7 @@
 
     <Label text="Planning &amp; Assignations" styleClass="page-title"/>
 
-    <TitledPane text="Nouvelle assignation" expanded="false">
+    <TitledPane fx:id="paneNouvelleAssignation" text="Nouvelle assignation" expanded="false">
         <VBox spacing="10">
             <HBox spacing="10">
                 <ComboBox fx:id="comboProfesseur" promptText="Professeur" HBox.hgrow="ALWAYS"/>

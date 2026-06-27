@@ -64,7 +64,7 @@ public class RapportService {
     }
 
     public void marquerCommePaye(Long rapportId) {
-        AccesService.exigerRole(Role.ADMIN);
+        AccesService.exigerRole(Role.ADMIN,Role.SCOLARITE);
         RapportMensuel rapport = rapportDAO.findById(rapportId)
                 .orElseThrow(() -> new IllegalArgumentException("Rapport introuvable"));
 
@@ -83,6 +83,5 @@ public class RapportService {
         // TODO: génération PDF (iText ou autre)
         System.out.println("Export PDF du rapport ID: " + rapportId);
 
-        // pour l’instant simulation
     }
 }
