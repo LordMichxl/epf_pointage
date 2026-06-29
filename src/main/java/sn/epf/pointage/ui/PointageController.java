@@ -77,7 +77,12 @@ public class PointageController {
             new KeyFrame(Duration.seconds(1), e -> {
                 labelHeure.setText(LocalDateTime.now().format(FMT_HEURE));
                 SeancePlanifiee sel = tableSeances.getSelectionModel().getSelectedItem();
-                if (sel != null) mettreAJourBoutons(sel);
+                if (sel != null) {
+                    mettreAJourBoutons(sel);
+                } else {
+                    btnPointerDebut.setDisable(true);
+                    btnPointerFin.setDisable(true);
+                }
             })
         );
         horlogeTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -142,10 +147,10 @@ public class PointageController {
                 if (empty) { setText(null); setStyle(""); return; }
                 SeancePlanifiee s = getTableView().getItems().get(getIndex());
                 switch (s.getStatut()) {
-                    case PLANIFIEE  -> { setText("⏳ Planifiée");  setStyle("-fx-text-fill: #241654;"); }
-                    case REALISEE   -> { setText("✅ Réalisée");   setStyle("-fx-text-fill: #1E8449; -fx-font-weight: bold;"); }
-                    case ANNULEE    -> { setText("❌ Annulée");    setStyle("-fx-text-fill: #C0392B;"); }
-                    case REPORTEE   -> { setText("🔁 Reportée");  setStyle("-fx-text-fill: #D35400;"); }
+                    case PLANIFIEE -> { setText("Planifiée");  setStyle("-fx-text-fill: #241654;"); }
+                    case REALISEE -> { setText("Réalisée");   setStyle("-fx-text-fill: #1E8449; -fx-font-weight: bold;"); }
+                    case ANNULEE -> { setText("Annulée");    setStyle("-fx-text-fill: #C0392B;"); }
+                    case REPORTEE -> { setText("Reportée");  setStyle("-fx-text-fill: #D35400;"); }
                 }
             }
         });
@@ -163,8 +168,9 @@ public class PointageController {
         });
     }
 
-    // Chargement des séances du jour
     private void chargerSeances() {
+        SeancePlanifiee selectionAvant = tableSeances.getSelectionModel().getSelectedItem();
+        Long idASelectionner = (selectionAvant != null) ? selectionAvant.getId() : null;
         Utilisateur user = SessionContext.getInstance().getUtilisateurConnecte();
         if (user == null) return;
 
@@ -185,6 +191,16 @@ public class PointageController {
         tableSeances.setItems(FXCollections.observableArrayList(seances));
         labelNbSeances.setText("(" + seances.size() + ")");
         mettreAJourRecap(seances);
+
+        if (idASelectionner != null) {
+            seances.stream()
+                    .filter(s -> s.getId().equals(idASelectionner))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            s -> tableSeances.getSelectionModel().select(s),
+                            () -> { btnPointerDebut.setDisable(true); btnPointerFin.setDisable(true); }
+                    );
+        }
     }
 
     private void mettreAJourRecap(List<SeancePlanifiee> seances) {
@@ -244,7 +260,10 @@ public class PointageController {
     @FXML
     private void pointerDebut() {
         SeancePlanifiee seance = tableSeances.getSelectionModel().getSelectedItem();
-        if (seance == null) return;
+        if (seance == null){
+            afficherMessage("Aucune séance sélectionnée", "#C0392B");
+            return;
+        }
         Utilisateur user = SessionContext.getInstance().getUtilisateurConnecte();
         if (user == null || user.getProfesseurLie() == null) return;
 
@@ -269,9 +288,9 @@ public class PointageController {
 
     private void afficherResultatPointage(ResultatPointage resultat) {
         switch (resultat) {
-            case SUCCES      -> afficherMessage("Pointage enregistré avec succès !", "#1E8449");
-            case EN_RETARD   -> afficherMessage(" Pointage enregistré — vous êtes en retard. La scolarité a été notifiée.", "#D35400");
-            case TROP_TOT    -> afficherMessage("Trop tôt ! La fenêtre de pointage n'est pas encore ouverte (RG-01).", "#C0392B");
+            case SUCCES -> afficherMessage("Pointage enregistré avec succès !", "#1E8449");
+            case EN_RETARD -> afficherMessage(" Pointage enregistré — vous êtes en retard. La scolarité a été notifiée.", "#D35400");
+            case TROP_TOT -> afficherMessage("Trop tôt ! La fenêtre de pointage n'est pas encore ouverte (RG-01).", "#C0392B");
             case PROF_INACTIF-> afficherMessage("Votre compte est inactif. Contactez la scolarité.", "#C0392B");
         }
     }

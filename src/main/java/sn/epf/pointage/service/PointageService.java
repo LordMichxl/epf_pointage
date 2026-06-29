@@ -21,14 +21,14 @@ public class PointageService {
 
         Professeur prof = professeurDAO.findById(professeurId)
                 .orElseThrow(() -> new IllegalArgumentException("Professeur introuvable"));
-        if (!prof.getActif()) {
+        if (Boolean.FALSE.equals(prof.getActif())) {
             return ResultatPointage.PROF_INACTIF;
         }
 
 
         long ecart = ChronoUnit.MINUTES.between(
-                seance.getDateHeure(),   // A = heure prévue de la séance
-                LocalDateTime.now()      // B = maintenant
+                seance.getDateHeure(),
+                LocalDateTime.now()
         );
 
         if (ecart < -15) {
@@ -52,6 +52,7 @@ public class PointageService {
                     + " pour la séance " + seanceId);
 
         } else {
+            pointage.setStatut(StatutPointage.A_LHEURE);
             resultat = ResultatPointage.SUCCES;
         }
         pointageDAO.save(pointage);
